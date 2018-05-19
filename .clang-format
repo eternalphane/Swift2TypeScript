@@ -1,0 +1,25 @@
+---
+Language: Cpp
+# BasedOnStyle: LLVM
+
+AlignAfterOpenBracket: AlwaysBreak
+AlignEscapedNewlines: Left
+AllowShortFunctionsOnASingleLine: Empty
+AlwaysBreakTemplateDeclarations: true
+BraceWrapping:
+    AfterClass: true
+    AfterControlStatement: true
+    AfterEnum: true
+    AfterFunction: true
+    AfterNamespace: true
+    AfterStruct: true
+    AfterUnion: true
+    BeforeCatch: true
+    BeforeElse: true
+BreakBeforeBinaryOperators: All
+BreakBeforeBraces: Custom
+ColumnLimit: 0
+IndentCaseLabels: true
+IndentWidth: 4
+TabWidth: 4
+...

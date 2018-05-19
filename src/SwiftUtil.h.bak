@@ -1,0 +1,165 @@
+#pragma once
+#include "../grammars/.antlr/SwiftLexer.h"
+#include "antlr4-runtime.h"
+
+namespace swift_util
+{
+    const int opLWS[]{
+        SwiftLexer::WHITESPACE,
+        SwiftLexer::LINE_BREAK,
+        SwiftLexer::LEFT_PARENTHESIS,
+        SwiftLexer::LEFT_BRACKET,
+        SwiftLexer::LEFT_BRACE,
+        SwiftLexer::COMMA,
+        SwiftLexer::SEMICOLON,
+        SwiftLexer::COLON
+    };
+    const int opRWS[]{
+        SwiftLexer::WHITESPACE,
+        SwiftLexer::LINE_BREAK,
+        SwiftLexer::RIGHT_PARENTHESIS,
+        SwiftLexer::RIGHT_BRACKET,
+        SwiftLexer::RIGHT_BRACE,
+        SwiftLexer::COMMA,
+        SwiftLexer::SEMICOLON,
+        SwiftLexer::COLON,
+        SwiftLexer::PERIOD
+    };
+    const int opChar[]{
+        SwiftLexer::SLASH,
+        SwiftLexer::EQUAL,
+        SwiftLexer::MINUS,
+        SwiftLexer::PLUS,
+        SwiftLexer::EXCLAMATION,
+        SwiftLexer::ASTERISK,
+        SwiftLexer::PERCENT,
+        SwiftLexer::LESS_THAN,
+        SwiftLexer::GREATER_THAN,
+        SwiftLexer::AMPERSAND,
+        SwiftLexer::PIPE,
+        SwiftLexer::CARET,
+        SwiftLexer::TILDE,
+        SwiftLexer::QUESTION,
+        SwiftLexer::OPERATOR_HEAD_OTHER,
+        SwiftLexer::OPERATOR_CHARACTER_OTHER
+    };
+
+    bool testLN(antlr4::TokenStream *input, int n, std::initializer_list<int> tokens, bool hidden = false, bool fallback = false)
+    {
+        return testLN(input, n, tokens.begin(), tokens.size(), hidden, fallback);
+    }
+
+    bool testLN(antlr4::TokenStream *input, int n, const int *tokens, size_t size, bool hidden = false, bool fallback = false)
+    {
+        int tn;
+        if (hidden)
+        {
+            try
+            {
+                tn = input->get(input->index() + n)->getType();
+            }
+            catch (antlr4::IndexOutOfBoundsException e)
+            {
+                return fallback;
+            }
+        }
+        else
+        {
+            tn = input->LA(n);
+            if (tn == SwiftLexer::EOF)
+                return fallback;
+        }
+        for (int i = 0; i < size; ++i)
+            if (tn == tokens[i])
+                return true;
+        return false;
+    }
+
+    bool testLN(antlr4::TokenStream *input, int n, std::initializer_list<std::string> tokens, bool hidden = false, bool fallback = false)
+    {
+        int i = input->index() + n;
+        std::string tn;
+        if (hidden)
+        {
+            try
+            {
+                tn = input->get(i)->getText();
+            }
+            catch (antlr4::IndexOutOfBoundsException e)
+            {
+                return fallback;
+            }
+        }
+        else
+        {
+            tn = input->LT(n)->getText();
+            if (tn == "<EOF>")
+                return fallback;
+        }
+        for (std::string t : tokens)
+            if (tn == t)
+                return true;
+        return false;
+    }
+
+    int tailOfOp(antlr4::TokenStream *input)
+    {
+        bool f1 = input->LA(1) == SwiftLexer::PERIOD, f2;
+        int i = 2;
+        for (int tp = input->LA(i); tp != -1; tp = input->LA(++i))
+        {
+            f2 = true;
+            for (int t : opChar)
+            {
+                if (tp == t)
+                {
+                    f2 = false;
+                    break;
+                }
+            }
+            if (f2 && !(f1 && tp == SwiftLexer::PERIOD))
+            {
+                break;
+            }
+        }
+        return i - 1;
+    }
+
+    bool isPreOp(antlr4::TokenStream *input, size_t size = 0)
+    {
+        if (!size)
+            size = tailOfOp(input);
+        return testLN(input, -1, opLWS, sizeof(opLWS), true, true) && !testLN(input, size, opRWS, sizeof(opRWS), true, true);
+    }
+
+    bool isBinOp(antlr4::TokenStream *input, size_t size = 0)
+    {
+        if (!size)
+            size = tailOfOp(input);
+        return !(testLN(input, -1, { SwiftLexer::WHITESPACE, SwiftLexer::LINE_BREAK }, true) ^ testLN(input, size, { SwiftLexer::WHITESPACE, SwiftLexer::LINE_BREAK }, true));
+    }
+
+    bool isPostOp(antlr4::TokenStream *input, size_t size = 0)
+    {
+        if (!size)
+            size = tailOfOp(input);
+        return !testLN(input, -1, opLWS, sizeof(opLWS), true, true) && testLN(input, size, opRWS, sizeof(opRWS), true, true);
+    }
+
+    bool isStatementStarting(antlr4::TokenStream *input)
+    {
+        for (int i = input->index() - 1; i > -1; --i)
+        {
+            int t = input->get(i)->getType();
+            if (t == SwiftLexer::LINE_BREAK || t == SwiftLexer::COMMA || t == SwiftLexer::LEFT_BRACE)
+            {
+                return true;
+            }
+            else if (t != SwiftLexer::WHITESPACE)
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+}

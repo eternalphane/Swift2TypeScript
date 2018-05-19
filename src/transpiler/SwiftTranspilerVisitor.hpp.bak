@@ -1,0 +1,38 @@
+#pragma once
+#include "OperatorTable.hpp"
+#include <SwiftParserBaseVisitor.h>
+
+namespace swift2ts
+{
+
+class SwiftTranspilerVisitor : public SwiftParserBaseVisitor
+{
+  private:
+    static inline size_t RESERVE_UNIT = 256;
+    static const std::string VALID_PRE_OP[];
+    OperatorTable _operators;
+
+  public:
+    antlrcpp::Any visitExpression(SwiftParser::ExpressionContext *ctx) override;
+    antlrcpp::Any visitTryOperator(SwiftParser::TryOperatorContext *ctx) override;
+    antlrcpp::Any visitPrefixExpression(SwiftParser::PrefixExpressionContext *ctx) override;
+    antlrcpp::Any visitInOutExpression(SwiftParser::InOutExpressionContext *ctx) override;
+    antlrcpp::Any visitIdentifier(SwiftParser::IdentifierContext *ctx) override;
+    antlrcpp::Any visitPrefixOperator(SwiftParser::PrefixOperatorContext *ctx) override;
+    antlrcpp::Any visitGeneralPostfixExpression(SwiftParser::GeneralPostfixExpressionContext *ctx) override;
+    antlrcpp::Any visitPostfixOperatorExpression(SwiftParser::PostfixOperatorExpressionContext *ctx) override;
+    antlrcpp::Any visitFunctionCallExpression(SwiftParser::FunctionCallExpressionContext *ctx) override;
+    antlrcpp::Any visitInitializerExpression(SwiftParser::InitializerExpressionContext *ctx) override;
+    antlrcpp::Any visitExplicitMemberExpression(SwiftParser::ExplicitMemberExpressionContext *ctx) override;
+    antlrcpp::Any visitPostfixSelfExpression(SwiftParser::PostfixSelfExpressionContext *ctx) override;
+    antlrcpp::Any visitSubscriptExpression(SwiftParser::SubscriptExpressionContext *ctx) override;
+    antlrcpp::Any visitForcedValueExpression(SwiftParser::ForcedValueExpressionContext *ctx) override;
+    antlrcpp::Any visitOptionalChainingExpression(SwiftParser::OptionalChainingExpressionContext *ctx) override;
+    antlrcpp::Any visitBinaryExpression(SwiftParser::BinaryExpressionContext *ctx) override;
+    antlrcpp::Any visitBinaryOperator(SwiftParser::BinaryOperatorContext *ctx) override;
+    antlrcpp::Any visitAssignmentOperator(SwiftParser::AssignmentOperatorContext *ctx) override;
+    antlrcpp::Any visitConditionalOperator(SwiftParser::ConditionalOperatorContext *ctx) override;
+    antlrcpp::Any visitTypeCastingOperator(SwiftParser::TypeCastingOperatorContext *ctx) override;
+};
+
+} // namespace swift2ts

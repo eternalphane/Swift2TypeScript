@@ -1,0 +1,245 @@
+#include "SwiftTranspilerVisitor.hpp"
+#include "ast/ASTNodes.hpp"
+#include "../utils/string_utils.hpp"
+
+using namespace swift2ts;
+
+const std::string SwiftTranspilerVisitor::VALID_PRE_OP[] { "+", "-", "!", "~" };
+
+antlrcpp::Any SwiftTranspilerVisitor::visitExpression(SwiftParser::ExpressionContext *ctx)
+{
+/*
+    std::string result;
+    result.reserve(RESERVE_UNIT * (ctx->children.size() + 1));
+    bool expand_try = ctx->tryOperator() && ctx->tryOperator()->stop->getType() != SwiftParser::TRY;
+    if (expand_try)
+    result += "(function() { try { return ";
+    result += visit(ctx->prefixExpression()).as<std::string>();
+    for (auto exp : ctx->binaryExpression())
+    result += visit(exp).as<std::string>();
+    if (expand_try)
+    {
+    result += "; } catch (e) { ";
+    if (ctx->tryOperator()->stop->getType() == SwiftParser::QUESTION)
+        result += "return null;";
+    else
+        result += "throw e;";
+    result += " } })()";
+    }
+    return result;
+ */
+    std::stack<ast::NodePtr> expr_stack;
+    std::stack<ast::BinaryOperatorPtr> bop_stack;
+    expr_stack.push(std::move(visit(ctx->prefixExpression()).as<ast::NodePtr>()));
+    for (auto bexpr : ctx->binaryExpression())
+    {
+        auto result = visit(bexpr);
+        if (bexpr->binaryOperator())
+        {
+            // binary operator
+            // push into stack
+            auto&& [bop_n, expr_n] = result.as<std::tuple<ast::BinaryOperatorPtr, ast::NodePtr>>();
+            for (auto bop = bop_stack.top();
+                 !bop_stack.empty() && _operators.compare(bop->text(), bop_n->text()) >= 0;
+                 bop = (bop_stack.pop(), bop_stack.top()))
+            {
+                bop->right = expr_stack.top();
+                expr_stack.pop();
+                bop->left = expr_stack.top();
+                expr_stack.top() = bop;
+            }
+            bop_stack.push(bop_n);
+            expr_stack.push(expr_n);
+        }
+        else
+        {
+            // not binary operator
+            // build ast
+            for (auto bop = bop_stack.top();
+                 !bop_stack.empty();
+                 bop = (bop_stack.pop(), bop_stack.top()))
+            {
+                bop->right = expr_stack.top();
+                expr_stack.pop();
+                bop->left = expr_stack.top();
+                expr_stack.top() = bop;
+            }
+            if (bexpr->assignmentOperator())
+            {
+                auto aop = result.as<ast::AssignmentOperatorPtr>();
+                aop->left = expr_stack.top();
+                expr_stack.top() = aop;
+            }
+            else if (bexpr->conditionalOperator())
+            {
+                auto cop = result.as<ast::ConditionalOperatorPtr>();
+                cop->condition = expr_stack.top();
+                expr_stack.top() = cop;
+            }
+            else
+            {
+                auto tcop = result.as<ast::TypeCastingOperatorPtr>();
+                tcop->expr = expr_stack.top();
+                expr_stack.top() = tcop;
+            }
+        }
+    }
+    if (ctx->tryOperator())
+    {
+        auto try_op = visit(ctx->tryOperator()).as<ast::TryOperatorPtr>();
+        try_op->expr = expr_stack.top();
+        expr_stack.top() = try_op;
+    }
+    return expr_stack.top();
+}
+
+antlrcpp::Any SwiftTranspilerVisitor::visitTryOperator(SwiftParser::TryOperatorContext *ctx)
+{
+    auto line = ctx->TRY->getLine(), col = ctx->TRY->getCharPositionInLine();
+    int type = ast::TryOperator::none;
+    if (ctx->TYPE)
+    {
+        if (ctx->TYPE->getType() == SwiftParser::QUESTION)
+            type = ast::TryOperator::optional;
+        else
+            type = ast::TryOperator::forced;
+    }
+    return std::make_shared<ast::TryOperator>(line, col, nullptr, type);
+}
+
+antlrcpp::Any SwiftTranspilerVisitor::visitPrefixExpression(SwiftParser::PrefixExpressionContext *ctx)
+{
+/*
+    std::string result;
+    result.reserve(RESERVE_UNIT * (ctx->children.size() + 1));
+    if (ctx->prefixOperator())
+    {
+        auto op = ctx->prefixOperator()->getText();
+        for (auto valid_op : VALID_PRE_OP)
+        {
+            if (op == valid_op)
+            {
+                result += op;
+                result += visit(ctx->postfixExpression()).as<std::string>();
+                return result;
+            }
+        }
+        // auto u32op = antlrcpp::utf8_to_utf32(op.data(), op.data() + op.size());
+        auto u32op = utils::to_u32(op);
+        auto format = "u%x";
+        result.reserve(result.size() + u32op.size() * 6);
+        for (auto code_point : u32op)
+            std::sprintf(&result[result.size()], format, code_point);
+        result += "(";
+        result += visit(ctx->postfixExpression()).as<std::string>();
+        result += ")";
+    }
+    else
+        result += visit(ctx->inOutExpression()).as<std::string>();
+    return result;
+ */
+    if (ctx->inOutExpression())
+        return visit(ctx->inOutExpression());
+    if (ctx->prefixOperator())
+    {
+        auto pop = visit(ctx->prefixOperator()).as<ast::PrefixOperatorPtr>();
+        pop->right = visit(ctx->postfixExpression()).as<ast::NodePtr>();
+        return pop;
+    }
+    return visit(ctx->postfixExpression());
+}
+
+antlrcpp::Any SwiftTranspilerVisitor::visitInOutExpression(SwiftParser::InOutExpressionContext *ctx)
+{
+/*
+    std::string result, identifier = visit(ctx->identifier());
+    result.reserve(RESERVE_UNIT * (ctx->children.size() + 1));
+    result += "{ get _(): int { return ";
+    result += identifier;
+    result += "; }, set _(_: int) { ";
+    result += identifier;
+    result += " = _; } }";
+    return result;
+ */
+    auto line = ctx->start->getLine(), col = ctx->start->getCharPositionInLine();
+    return std::make_shared<ast::InOutExpression>(
+        line, col,
+        visit(ctx->identifier()).as<ast::NodePtr>()
+    );
+}
+
+antlrcpp::Any SwiftTranspilerVisitor::visitIdentifier(SwiftParser::IdentifierContext *ctx)
+{
+/*
+    // TODO: check if identifier is valid
+    if (ctx->IDENTIFIER())
+        return ctx->IDENTIFIER()->getText();
+    if (ctx->QUOTED_IDENTIFIER())
+    {
+        auto id = ctx->QUOTED_IDENTIFIER()->getText();
+        return id.substr(1, id.size() - 2);
+    }
+    // TODO: add error handler instead of throwing it
+    auto t = ctx->IMPLICIT_PARAMETER_NAME()->getSymbol();
+    auto row = t->getLine(), col = t->getCharPositionInLine();
+    auto str = t->getText();
+    std::string msg(65 + str.size(), 0);
+    std::sprintf(&msg[0], "line %d:%d invalid implicit parameter at input '%s'", row, col, str.c_str());
+    throw new antlr4::ParseCancellationException(msg);
+ */
+    auto line = ctx->start->getLine(), col = ctx->start->getCharPositionInLine();
+    std::string text;
+    if (ctx->QUOTED_IDENTIFIER())
+    {
+        auto quoted = ctx->QUOTED_IDENTIFIER()->getText();
+        text = quoted.substr(1, quoted.size() - 2);
+    }
+    else
+    {
+        text = ctx->start->getText();
+    }
+    return std::make_shared<ast::Identifier>(line, col, std::move(text));
+}
+
+antlrcpp::Any SwiftTranspilerVisitor::visitBinaryExpression(SwiftParser::BinaryExpressionContext *ctx)
+{
+    if (ctx->binaryOperator())
+    {
+        return std::make_tuple(
+            visit(ctx->binaryOperator()).as<ast::BinaryOperatorPtr>(),
+            visit(ctx->prefixExpression()).as<ast::NodePtr>()
+        );
+    }
+    else if (ctx->typeCastingOperator())
+    {
+        return visit(ctx->typeCastingOperator());
+    }
+    else
+    {
+        auto line = ctx->start->getLine(), col = ctx->start->getCharPositionInLine();
+        auto expr = visit(ctx->prefixExpression()).as<ast::NodePtr>();
+        if (ctx->tryOperator())
+        {
+            auto top = visit(ctx->tryOperator()).as<ast::TryOperatorPtr>();
+            top->expr = expr;
+            expr = top;
+        }
+        if (ctx->assignmentOperator())
+        {
+            return std::make_shared<ast::AssignmentOperator>(line, col, nullptr, expr);
+        }
+        else
+        {
+            auto cop = visit(ctx->conditionalOperator()).as<ast::ConditionalOperatorPtr>();
+            cop->falseBranch = expr;
+            return cop;
+        }
+    }
+}
+
+antlrcpp::Any SwiftTranspilerVisitor::visitBinaryOperator(SwiftParser::BinaryOperatorContext *ctx)
+{
+    auto line = ctx->start->getLine(), col = ctx->start->getCharPositionInLine();
+    auto text = ctx->start->getText();
+    return std::make_shared<ast::BinaryOperator>(line, col, text, nullptr, nullptr);
+}
