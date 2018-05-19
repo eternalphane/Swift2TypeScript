@@ -1,0 +1,42 @@
+apply plugin: 'java'
+apply plugin: 'application'
+
+version = '0.1'
+sourceCompatibility = 1.8
+mainClassName = 'com.github.eternalphane.swift2typescript.Main'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'org.antlr:antlr4:4.7'
+    compile 'org.apache.commons:commons-lang3:3.7'
+}
+
+sourceSets.main.java {
+    exclude '**/.antlr/**'
+}
+
+task generateGrammarSource(type: JavaExec) {
+    description 'Generate grammar source files with org.antlr.v4.Tool'
+    classpath = sourceSets.main.compileClasspath
+    workingDir = file('src/main/java/com/github/eternalphane/swift2typescript')
+    main = 'org.antlr.v4.Tool'
+    args 'SwiftLexer.g4', 'SwiftParser.g4', '-no-listener', '-visitor', '-package', 'com.github.eternalphane.swift2typescript'
+}
+
+task cleanGrammarSource(type: Delete) {
+    description 'Clean grammar source files'
+    delete fileTree(
+        dir: 'src/main/java/com/github/eternalphane/swift2typescript',
+        includes: [
+            'SwiftLexer.java',
+            'SwiftParser*.java',
+            '*.tokens'
+        ]
+    )
+}
+
+compileJava.dependsOn generateGrammarSource
+clean.dependsOn cleanGrammarSource

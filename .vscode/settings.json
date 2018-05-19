@@ -1,0 +1,7 @@
+{
+    //"antlr4.generation.listeners": false,
+    //"antlr4.generation.mode": "none",
+    //"antlr4.generation.visitors": true,
+
+    "java.configuration.updateBuildConfiguration": "automatic"
+}
