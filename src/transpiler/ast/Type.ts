@@ -1,7 +1,8 @@
 /** @module "transpiler/ast" */
 
 import { mixin } from '../../Decorator';
-import { Attributes } from './Attribute';
+import { Interface } from '../../util';
+import { Attribute } from './Attribute';
 import { GenericIdentifier } from './Expression';
 import { ListLike, Node, ObjectLike } from './Node';
 import { Identifier } from './Primitive';
@@ -12,24 +13,24 @@ export abstract class Type extends Node {}
  * TypeIdentifier node.
  */
 @mixin(ListLike)
-export class TypeIdentifier extends Type implements ListLike<GenericIdentifier> {
-    public children: GenericIdentifier[];
+export class TypeIdentifier extends Type {
+    [n: number]: GenericIdentifier;
 }
 
 /**
  * ArrayType node.
  */
-@mixin(ListLike)
-export class ArrayType extends Type implements ListLike<Type> {
-    public children: Type[];
+@mixin(ObjectLike(['type']))
+export class ArrayType extends Type {
+    public type: Type;
 }
 
 /**
  * ProtocolCompositionType node.
  */
 @mixin(ListLike)
-export class ProtocolCompositionType extends Type implements ListLike<TypeIdentifier> {
-    public children: TypeIdentifier[];
+export class ProtocolCompositionType extends Type {
+    [n: number]: TypeIdentifier;
 }
 
 /**
@@ -72,7 +73,7 @@ export namespace MetaType {
  */
 @mixin(ObjectLike(['attributes', 'type']))
 export class TypeAnnotation extends Node {
-    public attributes: Attributes | null;
+    public attributes: Attribute[] | null;
     public kind: TypeAnnotation.Kind;
     public type: Type;
 
@@ -99,35 +100,15 @@ export class FunctionTypeArgument extends Node {
 }
 
 /**
- * FunctionTypeArgumentClause node.
- */
-@mixin(ListLike)
-export class FunctionTypeArgumentClause extends Node implements ListLike<FunctionTypeArgument> {
-    public children: FunctionTypeArgument[];
-    public kind: FunctionTypeArgumentClause.Kind;
-
-    constructor(line: number, col: number, kind: FunctionTypeArgumentClause.Kind) {
-        super(line, col);
-        this.kind = kind;
-    }
-}
-
-export namespace FunctionTypeArgumentClause {
-    export const enum Kind {
-        none,
-        variadic
-    }
-}
-
-/**
  * FunctionType node.
  */
 @mixin(ObjectLike(['arguments', 'attributes', 'return']))
 export class FunctionType extends Type {
-    public arguments: FunctionTypeArgumentClause;
-    public attributes: Attributes | null;
+    public arguments: FunctionTypeArgument[];
+    public attributes: Attribute[] | null;
     public kind: FunctionType.Kind;
     public return: Type;
+    public variadic: boolean;
 
     constructor(line: number, col: number, kind: FunctionType.Kind) {
         super(line, col);
@@ -153,7 +134,7 @@ export class SelfType extends Type {}
  */
 @mixin(ObjectLike(['attributes', 'name', 'type']))
 export class TupleTypeElement extends Node {
-    public attributes: Attributes | null;
+    public attributes: Attribute[] | null;
     public name: Identifier | null;
     public type: Type;
 }
@@ -162,14 +143,14 @@ export class TupleTypeElement extends Node {
  * TupleType node.
  */
 @mixin(ListLike)
-export class TupleType extends Type implements ListLike<TupleTypeElement> {
-    public children: TupleTypeElement[];
+export class TupleType extends Type {
+    [n: number]: TupleTypeElement;
 }
 
 /**
  * TypeInheritanceClause
  */
 @mixin(ListLike)
-export class TypeInheritanceClause extends Node implements ListLike<TypeIdentifier> {
-    public children: TypeIdentifier[];
+export class TypeInheritanceClause extends Node {
+    [n: number]: TypeIdentifier;
 }

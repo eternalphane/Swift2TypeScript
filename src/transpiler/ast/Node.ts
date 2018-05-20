@@ -6,7 +6,8 @@ import { ASTVisitor } from '../AstVisitor';
 /**
  * Node of abstract syntax tree.
  */
-export abstract class Node {
+export abstract class Node implements ArrayLike<Node> {
+    readonly [n: number]: Node;
     public readonly col: number;
     public readonly line: number;
     protected _children: Node[];
@@ -15,13 +16,23 @@ export abstract class Node {
         this.line = line;
         this.col = col;
         this._children = [];
+        return new Proxy(this, {
+            get(target: Node, key: PropertyKey, receiver: any): any {
+                return 'number' === typeof key
+                    ? target._children[key < 0 ? key + target.length : key]
+                    : Reflect.get(target, key);
+            },
+            set(target: Node, key: PropertyKey, value: any, receiver: any): boolean {
+                return 'number' === typeof key ? false : Reflect.set(target, key, value);
+            }
+        });
     }
 
     /**
-     * Children nodes.
+     * Number of children nodes.
      */
-    public get children(): Node[] {
-        return this._children.slice();
+    public get length(): number {
+        return this._children.length;
     }
 
     public accept(visitor: ASTVisitor): void {
@@ -32,19 +43,27 @@ export abstract class Node {
 }
 
 export abstract class ListLike<T extends Node> extends Node {
-    public get children(): T[] {
-        return this._children as T[];
+    private _init(): Node {
+        return new Proxy(this, {
+            set(target: ListLike<T>, key: PropertyKey, value: any, receiver: any): boolean {
+                return 'number' === typeof key
+                    ? key >= target._children.length || key < -target.length
+                        ? false
+                        : Reflect.set(target._children, key < 0 ? key + target.length : key, value)
+                    : Reflect.set(target, key, value);
+            }
+        });
     }
 }
 
 export function ObjectLike(keys: string[]): Constructor<Node> {
-    return class extends Node {
-        private _init(): this {
+    return class ObjectLike extends Node {
+        private _init(): Node {
             for (const key of keys) {
                 this[key] = null;
             }
             return new Proxy(this, {
-                set(target: any, key: PropertyKey, value: any, receiver: any): boolean {
+                set(target: ObjectLike, key: PropertyKey, value: any, receiver: any): boolean {
                     const result: boolean = Reflect.set(target, key, value, receiver);
                     if (keys.includes(key as string)) {
                         for (const key of keys) {

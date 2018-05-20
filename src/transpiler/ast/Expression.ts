@@ -2,10 +2,8 @@
 
 import { mixin } from '../../Decorator';
 import { FunctionResult } from './Declaration';
-import { GenericArgumentClause } from './Generic';
 import { ListLike, Node, ObjectLike } from './Node';
 import { Identifier } from './Primitive';
-import { Statements } from './Statement';
 import { Type, TypeAnnotation } from './Type';
 
 /**
@@ -71,7 +69,7 @@ export namespace TypeCastingOperator {
  */
 @mixin(ObjectLike(['arguments', 'identifier']))
 export class GenericIdentifier extends Node {
-    public arguments: GenericArgumentClause | null;
+    public arguments: Type[] | null;
     public identifier: Identifier;
 }
 
@@ -79,8 +77,8 @@ export class GenericIdentifier extends Node {
  * ArrayLiteral node.
  */
 @mixin(ListLike)
-export class ArrayLiteral extends Node implements ListLike<Node> {
-    public children: Node[];
+export class ArrayLiteral extends Node {
+    [n: number]: Node;
 }
 
 /**
@@ -96,8 +94,8 @@ export class DictionaryLiteralElement extends Node {
  * DictionaryLiteral node.
  */
 @mixin(ListLike)
-export class DictionaryLiteral extends Node implements ListLike<DictionaryLiteralElement> {
-    public children: DictionaryLiteralElement[];
+export class DictionaryLiteral extends Node {
+    [n: number]: DictionaryLiteralElement;
 }
 
 /**
@@ -107,14 +105,6 @@ export class DictionaryLiteral extends Node implements ListLike<DictionaryLitera
 export class FunctionCallArgument extends Node {
     public expr: Node;
     public label: Identifier | null;
-}
-
-/**
- * FunctionCallArgumentList node.
- */
-@mixin(ListLike)
-export class FunctionCallArgumentList extends Node implements ListLike<FunctionCallArgument> {
-    public children: FunctionCallArgument[];
 }
 
 /**
@@ -159,14 +149,6 @@ export namespace CaptureListItem {
 }
 
 /**
- * CaptureList node.
- */
-@mixin(ListLike)
-export class CaptureList extends Node implements ListLike<CaptureListItem> {
-    public children: CaptureListItem[];
-}
-
-/**
  * ClosureParameter node.
  */
 @mixin(ObjectLike(['name', 'typeAnnotation']))
@@ -189,21 +171,13 @@ export namespace ClosureParameter {
 }
 
 /**
- * ClosureParameterList node.
- */
-@mixin(ListLike)
-export class ClosureParameterList extends Node implements ListLike<ClosureParameter> {
-    public children: ClosureParameter[];
-}
-
-/**
  * ClosureSignature node.
  */
 @mixin(ObjectLike(['captures', 'parameters', 'result']))
 export class ClosureSignature extends Node {
-    public captures: CaptureList | null;
+    public captures: CaptureListItem[] | null;
     public kind: ClosureSignature.Kind;
-    public parameters: ClosureParameterList | null;
+    public parameters: ClosureParameter[] | null;
     public result: FunctionResult | null;
 }
 
@@ -220,7 +194,7 @@ export namespace ClosureSignature {
 @mixin(ObjectLike(['signature', 'statements']))
 export class ClosureExpression extends Node {
     public signature: ClosureSignature | null;
-    public statements: Statements | null;
+    public statements: Node[] | null;
 }
 
 /**
@@ -244,8 +218,8 @@ export class TupleElement extends Node {
  * TupleExpression node.
  */
 @mixin(ListLike)
-export class TupleExpression extends Node implements ListLike<TupleElement> {
-    public children: TupleElement[];
+export class TupleExpression extends Node {
+    [n: number]: TupleElement;
 }
 
 /**
@@ -299,7 +273,7 @@ export class KeyPathStringExpression extends Node {
  */
 @mixin(ObjectLike(['arguments', 'expr']))
 export class SubscriptExpression extends Node {
-    public arguments: FunctionCallArgumentList;
+    public arguments: FunctionCallArgument[];
     public expr: Node;
 }
 
@@ -329,7 +303,7 @@ export namespace UnwrappedExpression {
  */
 @mixin(ObjectLike(['arguments', 'expr', 'closure']))
 export class FunctionCallExpression extends Node {
-    public arguments: FunctionCallArgumentList | null;
+    public arguments: FunctionCallArgument[] | null;
     public expr: Node;
     public closure: ClosureExpression | null;
 }

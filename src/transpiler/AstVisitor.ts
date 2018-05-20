@@ -10,11 +10,8 @@ export class ASTVisitor {
      * @final
      */
     public visit(node: ast.Node): void {
-        for (let child of node.children) {
-            if ('string' === typeof child) {
-                child = node[child];
-            }
-            this.visit(child as ast.Node);
+        for (let i: number = 0; i < node.length; ++i) {
+            this.visit(node[i]);
         }
     }
 
@@ -75,10 +72,6 @@ export class ASTVisitor {
     }
 
     public visitTupleTypeElement(node: ast.TupleTypeElement): void {
-        return this.visit(node);
-    }
-
-    public visitFunctionTypeArgumentClause(node: ast.FunctionTypeArgumentClause): void {
         return this.visit(node);
     }
 
@@ -146,15 +139,7 @@ export class ASTVisitor {
         return this.visit(node);
     }
 
-    public visitClosureParameterList(node: ast.ClosureParameterList): void {
-        return this.visit(node);
-    }
-
     public visitClosureParameter(node: ast.ClosureParameter): void {
-        return this.visit(node);
-    }
-
-    public visitCaptureList(node: ast.CaptureList): void {
         return this.visit(node);
     }
 
@@ -210,15 +195,7 @@ export class ASTVisitor {
         return this.visit(node);
     }
 
-    public visitFunctionCallArgumentList(node: ast.FunctionCallArgumentList): void {
-        return this.visit(node);
-    }
-
     public visitFunctionCallArgument(node: ast.FunctionCallArgument): void {
-        return this.visit(node);
-    }
-
-    public visitStatements(node: ast.Statements): void {
         return this.visit(node);
     }
 
@@ -484,10 +461,6 @@ export class ASTVisitor {
         return this.visit(node);
     }
 
-    public visitAttributes(node: ast.Attributes): void {
-        return this.visit(node);
-    }
-
     public visitBalancedTokens(node: ast.BalancedTokens): void {
         return this.visit(node);
     }
@@ -545,10 +518,6 @@ export class ASTVisitor {
     }
 
     public visitSameTypeRequirement(node: ast.SameTypeRequirement): void {
-        return this.visit(node);
-    }
-
-    public visitGenericArgumentClause(node: ast.GenericArgumentClause): void {
         return this.visit(node);
     }
 }

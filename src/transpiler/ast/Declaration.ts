@@ -1,7 +1,7 @@
 /** @module "transpiler/ast" */
 
 import { mixin } from '../../Decorator';
-import { Attributes } from './Attribute';
+import { Attribute } from './Attribute';
 import { Node, ObjectLike } from './Node';
 import { Type } from './Type';
 
@@ -10,6 +10,6 @@ import { Type } from './Type';
  */
 @mixin(ObjectLike(['attributes', 'type']))
 export class FunctionResult extends Node {
-    public attributes: Attributes | null;
+    public attributes: Attribute[] | null;
     public type: Type;
 }
