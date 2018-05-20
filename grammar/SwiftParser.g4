@@ -401,6 +401,8 @@ captureListItem
 ;
 
 /**
+ * 'weak'
+ *
  * 'unowned'
  *
  * 'unowned' 'safe'
@@ -538,7 +540,7 @@ loopStatement
 // GRAMMAR OF A FOR-IN STATEMENT
 
 forInStatement
-    : 'for' 'case'? pattern 'in'? expression whereClause? codeBlock
+    : 'for' 'case'? pattern 'in' expression whereClause? codeBlock
 ;
 
 // GRAMMAR OF A WHILE STATEMENT

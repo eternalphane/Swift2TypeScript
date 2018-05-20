@@ -3,9 +3,8 @@
 import { mixin } from '../../Decorator';
 import { Interface } from '../../util';
 import { Attribute } from './Attribute';
-import { GenericIdentifier } from './Expression';
+import { GenericIdentifier, Identifier } from './Expression';
 import { ListLike, Node, ObjectLike } from './Node';
-import { Identifier } from './Primitive';
 
 export abstract class Type extends Node {}
 

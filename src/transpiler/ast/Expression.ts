@@ -1,66 +1,140 @@
 /** @module "transpiler/ast" */
 
 import { mixin } from '../../Decorator';
-import { FunctionResult } from './Declaration';
 import { ListLike, Node, ObjectLike } from './Node';
-import { Identifier } from './Primitive';
 import { Type, TypeAnnotation } from './Type';
+
+export abstract class Expression extends Node {}
+
+/**
+ * Identifier node.
+ */
+export class Identifier extends Expression {
+    public name: string;
+
+    constructor(line: number, col: number, name: string = '') {
+        super(line, col);
+        this.name = name;
+    }
+
+    public toString(): string {
+        return this.name;
+    }
+}
+
+/**
+ * Wildcard node.
+ */
+export class Wildcard extends Identifier {
+    public readonly name;
+
+    constructor(line: number, col: number) {
+        super(line, col, '_');
+    }
+}
+
+/**
+ * Literal node.
+ */
+export class Literal extends Expression {
+    public kind: 'boolean' | 'nil' | 'number' | 'string';
+    public value: string;
+
+    constructor(
+        line: number,
+        col: number,
+        kind: 'boolean' | 'nil' | 'number' | 'string' = 'string',
+        value: string = ''
+    ) {
+        super(line, col);
+        this.kind = kind;
+        this.value = value;
+    }
+
+    public toString(): string {
+        return this.value;
+    }
+}
+
+/**
+ * Operator node.
+ */
+@mixin(ObjectLike(['left', 'right']))
+export class Operator extends Expression {
+    public left: Expression | null;
+    public str: string;
+    public right: Expression | null;
+
+    constructor(line: number, col: number, str: string = '') {
+        super(line, col);
+        this.str = str;
+    }
+
+    public toString(): string {
+        return this.str;
+    }
+}
 
 /**
  * InOutExpression node.
  */
-@mixin(ObjectLike(['identifier']))
-export class InOutExpression extends Node {
-    public identifier: Identifier;
+@mixin(ObjectLike(['expr']))
+export class InOutExpression extends Expression {
+    public expr: Expression;
 }
 
 /**
  * TryOperator node.
  */
 @mixin(ObjectLike(['expr']))
-export class TryOperator extends Node {
-    public expr: Node;
+export class TryOperator extends Expression {
+    public expr: Expression;
+    public mark: '?' | '!' | null;
+
+    constructor(line: number, col: number, mark: '?' | '!' | null = null) {
+        super(line, col);
+        this.mark = mark;
+    }
 }
 
 /**
  * AssignmentOperator node.
  */
 @mixin(ObjectLike(['left', 'right']))
-export class AssignmentOperator extends Node {
-    public left: Node;
-    public right: Node;
+export class AssignmentOperator extends Expression {
+    public left: Expression;
+    public right: Expression;
 }
 
 /**
  * ConditionalOperator node.
  */
 @mixin(ObjectLike(['condition', 'falseBranch', 'trueBranch']))
-export class ConditionalOperator extends Node {
-    public condition: Node;
-    public falseBranch: Node;
-    public trueBranch: Node;
+export class ConditionalOperator extends Expression {
+    public condition: Expression;
+    public falseBranch: Expression;
+    public trueBranch: Expression;
 }
 
 /**
- * TypeCastingOperator node.
+ * IsTypeOperator node.
  */
 @mixin(ObjectLike(['type']))
-export class TypeCastingOperator extends Node {
-    public kind: TypeCastingOperator.Kind;
+export class IsTypeOperator extends Expression {
     public type: Type;
-
-    constructor(line: number, col: number, kind: TypeCastingOperator.Kind) {
-        super(line, col);
-        this.kind = kind;
-    }
 }
 
-export namespace TypeCastingOperator {
-    export const enum Kind {
-        none,
-        boolean,
-        forced,
-        optional
+/**
+ * AsTypeOperator node.
+ */
+@mixin(ObjectLike(['type']))
+export class AsTypeOperator extends Expression {
+    public mark: '?' | '!' | null;
+    public type: Type;
+
+    constructor(line: number, col: number, mark: '?' | '!' | null = null) {
+        super(line, col);
+        this.mark = mark;
     }
 }
 
@@ -68,7 +142,7 @@ export namespace TypeCastingOperator {
  * GenericIdentifier node.
  */
 @mixin(ObjectLike(['arguments', 'identifier']))
-export class GenericIdentifier extends Node {
+export class GenericIdentifier extends Expression {
     public arguments: Type[] | null;
     public identifier: Identifier;
 }
@@ -77,8 +151,8 @@ export class GenericIdentifier extends Node {
  * ArrayLiteral node.
  */
 @mixin(ListLike)
-export class ArrayLiteral extends Node {
-    [n: number]: Node;
+export class ArrayLiteral extends Expression {
+    [n: number]: Expression;
 }
 
 /**
@@ -86,15 +160,15 @@ export class ArrayLiteral extends Node {
  */
 @mixin(ObjectLike(['key', 'value']))
 export class DictionaryLiteralElement extends Node {
-    public key: Node;
-    public value: Node;
+    public key: Expression;
+    public value: Expression;
 }
 
 /**
  * DictionaryLiteral node.
  */
 @mixin(ListLike)
-export class DictionaryLiteral extends Node {
+export class DictionaryLiteral extends Expression {
     [n: number]: DictionaryLiteralElement;
 }
 
@@ -103,7 +177,7 @@ export class DictionaryLiteral extends Node {
  */
 @mixin(ObjectLike(['expr', 'label']))
 export class FunctionCallArgument extends Node {
-    public expr: Node;
+    public expr: Expression;
     public label: Identifier | null;
 }
 
@@ -111,40 +185,35 @@ export class FunctionCallArgument extends Node {
  * PlaygroundLiteral node.
  * @todo
  */
-export class PlaygroundLiteral extends Node {
+export class PlaygroundLiteral extends Expression {
     // todo
 }
 
 /**
  * SelfExpression node.
  */
-export class SelfExpression extends Node {}
+export class SelfExpression extends Expression {}
 
 /**
  * SelfExpression node.
  */
-export class SuperclassExpression extends Node {}
+export class SuperclassExpression extends Expression {}
 
 /**
  * CaptureListItem node.
  */
 @mixin(ObjectLike(['expr']))
 export class CaptureListItem extends Node {
-    public expr: Node;
-    public kind: CaptureListItem.Kind;
+    public expr: Expression;
+    public specifier: 'weak' | 'unowned' | 'unowned(safe)' | 'unowned(unsafe)' | null;
 
-    constructor(line: number, col: number, kind: CaptureListItem.Kind) {
+    constructor(
+        line: number,
+        col: number,
+        specifier: 'weak' | 'unowned' | 'unowned(safe)' | 'unowned(unsafe)' | null = null
+    ) {
         super(line, col);
-        this.kind = kind;
-    }
-}
-
-export namespace CaptureListItem {
-    export const enum Kind {
-        none,
-        unowned,
-        unowned_safe,
-        unowned_unsafe
+        this.specifier = specifier;
     }
 }
 
@@ -153,20 +222,13 @@ export namespace CaptureListItem {
  */
 @mixin(ObjectLike(['name', 'typeAnnotation']))
 export class ClosureParameter extends Node {
-    public kind: ClosureParameter.Kind;
     public name: Identifier;
     public typeAnnotation: TypeAnnotation | null;
+    public variadic: boolean;
 
-    constructor(line: number, col: number, kind: ClosureParameter.Kind) {
+    constructor(line: number, col: number, variadic: boolean = false) {
         super(line, col);
-        this.kind = kind;
-    }
-}
-
-export namespace ClosureParameter {
-    export const enum Kind {
-        none,
-        variadic
+        this.variadic = variadic;
     }
 }
 
@@ -176,15 +238,13 @@ export namespace ClosureParameter {
 @mixin(ObjectLike(['captures', 'parameters', 'result']))
 export class ClosureSignature extends Node {
     public captures: CaptureListItem[] | null;
-    public kind: ClosureSignature.Kind;
     public parameters: ClosureParameter[] | null;
-    public result: FunctionResult | null;
-}
+    public result: Type | null;
+    public throws: boolean;
 
-export namespace ClosureSignature {
-    export const enum Kind {
-        none,
-        throws
+    constructor(line: number, col: number, throws: boolean = false) {
+        super(line, col);
+        this.throws = throws;
     }
 }
 
@@ -192,7 +252,7 @@ export namespace ClosureSignature {
  * ClosureExpression node.
  */
 @mixin(ObjectLike(['signature', 'statements']))
-export class ClosureExpression extends Node {
+export class ClosureExpression extends Expression {
     public signature: ClosureSignature | null;
     public statements: Node[] | null;
 }
@@ -201,7 +261,7 @@ export class ClosureExpression extends Node {
  * ImplicitMemberExpression node.
  */
 @mixin(ObjectLike(['member']))
-export class ImplicitMemberExpression extends Node {
+export class ImplicitMemberExpression extends Expression {
     public member: Identifier;
 }
 
@@ -210,7 +270,7 @@ export class ImplicitMemberExpression extends Node {
  */
 @mixin(ObjectLike(['expr', 'label']))
 export class TupleElement extends Node {
-    public expr: Node;
+    public expr: Expression;
     public label: Identifier | null;
 }
 
@@ -218,7 +278,7 @@ export class TupleElement extends Node {
  * TupleExpression node.
  */
 @mixin(ListLike)
-export class TupleExpression extends Node {
+export class TupleExpression extends Expression {
     [n: number]: TupleElement;
 }
 
@@ -234,7 +294,7 @@ export class KeyPathComponent extends Node {
  * KeyPathExpression node.
  * @todo
  */
-export class KeyPathExpression extends Node {
+export class KeyPathExpression extends Expression {
     // todo
 }
 
@@ -242,21 +302,13 @@ export class KeyPathExpression extends Node {
  * SelectorExpression node.
  */
 @mixin(ObjectLike(['expr']))
-export class SelectorExpression extends Node {
-    public expr: Node;
-    public kind: SelectorExpression.Kind;
+export class SelectorExpression extends Expression {
+    public expr: Expression;
+    public kind: 'getter' | 'setter' | null;
 
-    constructor(line: number, col: number, kind: SelectorExpression.Kind) {
+    constructor(line: number, col: number, kind: 'getter' | 'setter' | null = null) {
         super(line, col);
         this.kind = kind;
-    }
-}
-
-export namespace SelectorExpression {
-    export const enum Kind {
-        method,
-        getter,
-        setter
     }
 }
 
@@ -264,37 +316,30 @@ export namespace SelectorExpression {
  * KeyPathStringExpression node.
  */
 @mixin(ObjectLike(['expr']))
-export class KeyPathStringExpression extends Node {
-    public expr: Node;
+export class KeyPathStringExpression extends Expression {
+    public expr: Expression;
 }
 
 /**
  * SubscriptExpression node.
  */
 @mixin(ObjectLike(['arguments', 'expr']))
-export class SubscriptExpression extends Node {
+export class SubscriptExpression extends Expression {
     public arguments: FunctionCallArgument[];
-    public expr: Node;
+    public expr: Expression;
 }
 
 /**
  * UnwrappedExpression node.
  */
 @mixin(ObjectLike(['expr']))
-export class UnwrappedExpression extends Node {
-    public expr: Node;
-    public kind: UnwrappedExpression.Kind;
+export class UnwrappedExpression extends Expression {
+    public expr: Expression;
+    public mark: '?' | '!';
 
-    constructor(line: number, col: number, kind: UnwrappedExpression.Kind) {
+    constructor(line: number, col: number, mark: '?' | '!' = '?') {
         super(line, col);
-        this.kind = kind;
-    }
-}
-
-export namespace UnwrappedExpression {
-    export const enum Kind {
-        forced,
-        optional
+        this.mark = mark;
     }
 }
 
@@ -302,9 +347,9 @@ export namespace UnwrappedExpression {
  * FunctionCallExpression node.
  */
 @mixin(ObjectLike(['arguments', 'expr', 'closure']))
-export class FunctionCallExpression extends Node {
+export class FunctionCallExpression extends Expression {
     public arguments: FunctionCallArgument[] | null;
-    public expr: Node;
+    public expr: Expression;
     public closure: ClosureExpression | null;
 }
 
@@ -312,8 +357,8 @@ export class FunctionCallExpression extends Node {
  * ExplicitMemberExpression node.
  */
 @mixin(ObjectLike(['expr', 'labels', 'member']))
-export class ExplicitMemberExpression extends Node {
-    public expr: Node;
+export class ExplicitMemberExpression extends Expression {
+    public expr: Expression;
     public labels: Identifier[] | null;
     public member: GenericIdentifier;
 }

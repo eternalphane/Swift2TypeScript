@@ -99,7 +99,11 @@ export class ASTVisitor {
         return this.visit(node);
     }
 
-    public visitTypeCastingOperator(node: ast.TypeCastingOperator): void {
+    public visitIsTypeOperator(node: ast.IsTypeOperator): void {
+        return this.visit(node);
+    }
+
+    public visitAsTypeOperator(node: ast.AsTypeOperator): void {
         return this.visit(node);
     }
 
@@ -477,7 +481,7 @@ export class ASTVisitor {
         return this.visit(node);
     }
 
-    public visitTuplePatternAlternative(node: ast.TuplePatternAlternative): void {
+    public visitTuplePattern(node: ast.TuplePattern): void {
         return this.visit(node);
     }
 
@@ -485,15 +489,15 @@ export class ASTVisitor {
         return this.visit(node);
     }
 
-    public visitTypeCastingPattern(node: ast.TypeCastingPattern): void {
+    public visitIsTypePattern(node: ast.IsTypePattern): void {
+        return this.visit(node);
+    }
+
+    public visitAsTypePattern(node: ast.AsTypePattern): void {
         return this.visit(node);
     }
 
     public visitOptionalPattern(node: ast.OptionalPattern): void {
-        return this.visit(node);
-    }
-
-    public visitTuplePattern(node: ast.TuplePattern): void {
         return this.visit(node);
     }
 
