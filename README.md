@@ -1,8 +1,8 @@
-# Swift to TypeScript Transpiler
-This is an open source Swift4 to TypeScript transpiler powered by ANTLR4.
+# Swift2TS Cross-Platform Solution
+This is an open source cross-platform solution which can convert native iOS app written in Swift to cross-platform web app. The build-in Swift4 to TypeScript transpiler is powered by ANTLR4.
 
 WIP
-## Examples
+## Transpiler Examples
 ### Data Types
 + Numeric Types
 
