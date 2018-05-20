@@ -14,6 +14,11 @@ export abstract class Pattern extends Node {}
 export class ValueBindingPattern extends Pattern {
     public kind: 'var' | 'let';
     public value: Pattern;
+
+    constructor(line: number, col: number, kind: 'var' | 'let' = 'var') {
+        super(line, col);
+        this.kind = kind;
+    }
 }
 
 /**

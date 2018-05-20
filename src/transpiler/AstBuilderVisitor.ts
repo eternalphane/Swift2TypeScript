@@ -881,7 +881,7 @@ export class ASTBuilderVisitor extends AbstractParseTreeVisitor<Node>
         return this.visitChildren(ctx);
     }
 
-    public visitProtocolMemberDeclatation(ctx: SwiftParser.ProtocolMemberDeclatationContext): Node {
+    public visitProtocolMemberDeclaration(ctx: SwiftParser.ProtocolMemberDeclarationContext): Node {
         return this.visitChildren(ctx);
     }
 

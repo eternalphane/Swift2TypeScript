@@ -1,10 +1,12 @@
 /** @module "transpiler/ast" */
 
 import { mixin } from '../../Decorator';
+import { Attribute } from './Attribute';
 import { ListLike, Node, ObjectLike } from './Node';
-import { Type, TypeAnnotation } from './Type';
+import { Statement } from './Statement';
+import { Type } from './Type';
 
-export abstract class Expression extends Node {}
+export abstract class Expression extends Statement {}
 
 /**
  * Identifier node.
@@ -37,22 +39,19 @@ export class Wildcard extends Identifier {
  * Literal node.
  */
 export class Literal extends Expression {
-    public kind: 'boolean' | 'nil' | 'number' | 'string';
-    public value: string;
+    public value: string | number | boolean | null;
 
-    constructor(
-        line: number,
-        col: number,
-        kind: 'boolean' | 'nil' | 'number' | 'string' = 'string',
-        value: string = ''
-    ) {
+    constructor(line: number, col: number, value: string | number | boolean | null = null) {
         super(line, col);
-        this.kind = kind;
         this.value = value;
     }
 
+    public get kind(): 'string' | 'number' | 'boolean' | 'nil' {
+        return null === this.value ? 'nil' : (typeof this.value as any);
+    }
+
     public toString(): string {
-        return this.value;
+        return String(this.value);
     }
 }
 
@@ -200,18 +199,19 @@ export class SelfExpression extends Expression {}
 export class SuperclassExpression extends Expression {}
 
 /**
+ * CaptureSpecifier type.
+ */
+export type CaptureSpecifier = 'weak' | 'unowned' | 'unowned(safe)' | 'unowned(unsafe)';
+
+/**
  * CaptureItem node.
  */
 @mixin(ObjectLike(['expr']))
 export class CaptureItem extends Node {
     public expr: Expression;
-    public specifier: 'weak' | 'unowned' | 'unowned(safe)' | 'unowned(unsafe)' | null;
+    public specifier: CaptureSpecifier | null;
 
-    constructor(
-        line: number,
-        col: number,
-        specifier: 'weak' | 'unowned' | 'unowned(safe)' | 'unowned(unsafe)' | null = null
-    ) {
+    constructor(line: number, col: number, specifier: CaptureSpecifier | null = null) {
         super(line, col);
         this.specifier = specifier;
     }
@@ -220,14 +220,17 @@ export class CaptureItem extends Node {
 /**
  * ClosureParameter node.
  */
-@mixin(ObjectLike(['name', 'typeAnnotation']))
+@mixin(ObjectLike(['attrs[]', 'name', 'type']))
 export class ClosureParameter extends Node {
+    public attrs: Attribute[];
+    public inout: boolean;
     public name: Identifier;
-    public typeAnnotation: TypeAnnotation | null;
+    public type: Type | null;
     public variadic: boolean;
 
-    constructor(line: number, col: number, variadic: boolean = false) {
+    constructor(line: number, col: number, inout: boolean = false, variadic: boolean = false) {
         super(line, col);
+        this.inout = inout;
         this.variadic = variadic;
     }
 }
@@ -235,10 +238,10 @@ export class ClosureParameter extends Node {
 /**
  * ClosureSignature node.
  */
-@mixin(ObjectLike(['captures[]', 'parameters[]', 'result']))
+@mixin(ObjectLike(['captures[]', 'params[]', 'result']))
 export class ClosureSignature extends Node {
     public captures: CaptureItem[];
-    public parameters: ClosureParameter[];
+    public params: ClosureParameter[];
     public result: Type | null;
     public throws: boolean;
 
@@ -254,7 +257,7 @@ export class ClosureSignature extends Node {
 @mixin(ObjectLike(['signature', 'stmts[]']))
 export class ClosureExpression extends Expression {
     public signature: ClosureSignature | null;
-    public stmts: Node[];
+    public stmts: Statement[];
 }
 
 /**

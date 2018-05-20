@@ -6,12 +6,14 @@ import { Expression, Identifier } from './Expression';
 import { ListLike, Node, ObjectLike } from './Node';
 import { Pattern } from './Pattern';
 
+export abstract class Statement extends Node {}
+
 /**
  * Abstract syntax tree.
  */
 @mixin(ListLike)
 export class AST extends Node {
-    [n: number]: Node;
+    [n: number]: Statement;
 
     constructor() {
         super(1, 0);
@@ -22,8 +24,8 @@ export class AST extends Node {
  * ForInStatement node.
  */
 @mixin(ObjectLike(['body[]', 'label', 'pattern', 'sequence', 'where']))
-export class ForInStatement extends Node {
-    public body: Node[];
+export class ForInStatement extends Statement {
+    public body: Statement[];
     public case: boolean;
     public label: Identifier | null;
     public pattern: Pattern;
@@ -38,7 +40,6 @@ export class ForInStatement extends Node {
 
 /**
  * AvailabilityArgument node.
- * @todo
  */
 export class AvailabilityArgument extends Node {
     public platform:
@@ -72,7 +73,6 @@ export class AvailabilityArgument extends Node {
 
 /**
  * AvailabilityCondition node.
- * @todo
  */
 @mixin(ListLike)
 export class AvailabilityCondition extends Node {
@@ -94,30 +94,31 @@ export class CaseCondition extends Node {
 @mixin(ObjectLike(['initializer', 'pattern']))
 export class OptionalBindingCondition extends Node {
     public initializer: Expression;
-    public kind: 'let' | 'var';
+    public kind: 'var' | 'let';
     public pattern: Pattern;
 
-    constructor(line: number, col: number, kind: 'let' | 'var' = 'let') {
+    constructor(line: number, col: number, kind: 'var' | 'let' = 'var') {
         super(line, col);
         this.kind = kind;
     }
 }
 
 /**
- * ConditionList node.
+ * Condition type.
  */
-@mixin(ListLike)
-export class ConditionList extends Node {
-    [n: number]: Expression | AvailabilityCondition | CaseCondition | OptionalBindingCondition;
-}
+export type Condition =
+    | Expression
+    | AvailabilityCondition
+    | CaseCondition
+    | OptionalBindingCondition;
 
 /**
  * WhileStatement node.
  */
-@mixin(ObjectLike(['body[]', 'conditions', 'label']))
-export class WhileStatement extends Node {
-    public body: Node[];
-    public conditions: ConditionList;
+@mixin(ObjectLike(['body[]', 'conditions[]', 'label']))
+export class WhileStatement extends Statement {
+    public body: Statement[];
+    public conditions: Condition[];
     public label: Identifier | null;
 }
 
@@ -125,8 +126,8 @@ export class WhileStatement extends Node {
  * RepeatWhileStatement node.
  */
 @mixin(ObjectLike(['body[]', 'condition', 'label']))
-export class RepeatWhileStatement extends Node {
-    public body: Node[];
+export class RepeatWhileStatement extends Statement {
+    public body: Statement[];
     public condition: Expression;
     public label: Identifier | null;
 }
@@ -134,10 +135,10 @@ export class RepeatWhileStatement extends Node {
 /**
  * IfStatement node.
  */
-@mixin(ObjectLike(['body[]', 'condition', 'else', 'label']))
-export class IfStatement extends Node {
-    public body: Node[];
-    public conditions: ConditionList;
+@mixin(ObjectLike(['body[]', 'conditions[]', 'else', 'label']))
+export class IfStatement extends Statement {
+    public body: Statement[];
+    public conditions: Condition[];
     public else: ElseClause | null;
     public label: Identifier | null;
 }
@@ -145,19 +146,19 @@ export class IfStatement extends Node {
 /**
  * ElseClause node.
  */
-@mixin(ObjectLike(['body', 'if']))
+@mixin(ObjectLike(['body[]', 'if']))
 export class ElseClause extends Node {
-    public body: Node[];
+    public body: Statement[];
     public if: IfStatement | null;
 }
 
 /**
  * GuardStatement node.
  */
-@mixin(ObjectLike(['body[]', 'conditions']))
-export class GuardStatement extends Node {
-    public body: Node[];
-    public conditions: ConditionList;
+@mixin(ObjectLike(['body[]', 'conditions[]']))
+export class GuardStatement extends Statement {
+    public body: Statement[];
+    public conditions: Condition[];
 }
 
 /**
@@ -175,14 +176,14 @@ export class CaseItem extends Node {
 @mixin(ObjectLike(['caseItems[]', 'stmts[]']))
 export class SwitchCase extends Node {
     public caseItems: CaseItem[];
-    public stmts: Node[];
+    public stmts: Statement[];
 }
 
 /**
  * SwitchStatement node.
  */
 @mixin(ObjectLike(['cases[]', 'expr', 'label']))
-export class SwitchStatement extends Node {
+export class SwitchStatement extends Statement {
     public cases: SwitchCase[];
     public expr: Expression;
     public label: Identifier | null;
@@ -192,7 +193,7 @@ export class SwitchStatement extends Node {
  * BreakStatement node.
  */
 @mixin(ObjectLike(['label']))
-export class BreakStatement extends Node {
+export class BreakStatement extends Statement {
     public label: Identifier | null;
 }
 
@@ -200,20 +201,20 @@ export class BreakStatement extends Node {
  * ContinueStatement node.
  */
 @mixin(ObjectLike(['label']))
-export class ContinueStatement extends Node {
+export class ContinueStatement extends Statement {
     public label: Identifier | null;
 }
 
 /**
  * FallthroughStatement node.
  */
-export class FallthroughStatement extends Node {}
+export class FallthroughStatement extends Statement {}
 
 /**
  * ReturnStatement node.
  */
 @mixin(ObjectLike(['expr']))
-export class ReturnStatement extends Node {
+export class ReturnStatement extends Statement {
     public expr: Expression | null;
 }
 
@@ -221,7 +222,7 @@ export class ReturnStatement extends Node {
  * ThrowStatement node.
  */
 @mixin(ObjectLike(['expr']))
-export class ThrowStatement extends Node {
+export class ThrowStatement extends Statement {
     public expr: Expression;
 }
 
@@ -229,8 +230,8 @@ export class ThrowStatement extends Node {
  * DeferStatement node.
  */
 @mixin(ObjectLike(['body[]']))
-export class DeferStatement extends Node {
-    public body: Node[];
+export class DeferStatement extends Statement {
+    public body: Statement[];
 }
 
 /**
@@ -238,7 +239,7 @@ export class DeferStatement extends Node {
  */
 @mixin(ObjectLike(['body[]', 'pattern', 'where']))
 export class CatchClause extends Node {
-    public body: Node[];
+    public body: Statement[];
     public pattern: Pattern | null;
     public where: Expression | null;
 }
@@ -247,8 +248,8 @@ export class CatchClause extends Node {
  * DoStatement node.
  */
 @mixin(ObjectLike(['body[]', 'catchClause[]']))
-export class DoStatement extends Node {
-    public body: Node[];
+export class DoStatement extends Statement {
+    public body: Statement[];
     public catchClauses: CatchClause[];
 }
 
@@ -256,7 +257,7 @@ export class DoStatement extends Node {
  * ConditionalCompilationBlock node.
  * @todo
  */
-export class ConditionalCompilationBlock extends Node {
+export class ConditionalCompilationBlock extends Statement {
     // todo
 }
 
@@ -280,6 +281,6 @@ export class PlatformCondition extends Node {
  * LineControlStatement node.
  * @todo
  */
-export class LineControlStatement extends Node {
+export class LineControlStatement extends Statement {
     // todo
 }

@@ -1148,11 +1148,11 @@ protocolMembers
 ;
 
 protocolMember
-    : protocolMemberDeclatation
+    : protocolMemberDeclaration
     | compilerControlStatement
 ;
 
-protocolMemberDeclatation
+protocolMemberDeclaration
     : protocolPropertyDeclaration
     | protocolMethodDeclaration
     | protocolInitializerDeclaration

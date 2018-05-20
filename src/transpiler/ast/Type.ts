@@ -51,75 +51,51 @@ export class DictionaryType extends Type {
  */
 @mixin(ObjectLike(['ofType']))
 export class MetaType extends Type {
-    public kind: MetaType.Kind;
+    public kind: 'type' | 'protocol';
     public ofType: Type;
 
-    constructor(line: number, col: number, kind: MetaType.Kind) {
+    constructor(line: number, col: number, kind: 'type' | 'protocol' = 'type') {
         super(line, col);
         this.kind = kind;
-    }
-}
-
-export namespace MetaType {
-    export const enum Kind {
-        type,
-        protocol
-    }
-}
-
-/**
- * TypeAnnotation node.
- */
-@mixin(ObjectLike(['attributes[]', 'type']))
-export class TypeAnnotation extends Node {
-    public attributes: Attribute[];
-    public kind: TypeAnnotation.Kind;
-    public type: Type;
-
-    constructor(line: number, col: number, kind: TypeAnnotation.Kind) {
-        super(line, col);
-        this.kind = kind;
-    }
-}
-
-export namespace TypeAnnotation {
-    export const enum Kind {
-        none,
-        inout
     }
 }
 
 /**
  * FunctionTypeArgument node.
  */
-@mixin(ObjectLike(['label', 'typeAnnotation']))
+@mixin(ObjectLike(['attrs[]', 'label', 'type']))
 export class FunctionTypeArgument extends Node {
+    public attrs: Attribute[];
+    public inout: boolean;
     public label: Identifier | null;
-    public typeAnnotation: TypeAnnotation;
+    public type: Type;
+
+    constructor(line: number, col: number, inout: boolean) {
+        super(line, col);
+        this.inout = inout;
+    }
 }
 
 /**
  * FunctionType node.
  */
-@mixin(ObjectLike(['arguments[]', 'attributes[]', 'return']))
+@mixin(ObjectLike(['args[]', 'attrs[]', 'return']))
 export class FunctionType extends Type {
-    public arguments: FunctionTypeArgument[];
-    public attributes: Attribute[];
-    public kind: FunctionType.Kind;
+    public args: FunctionTypeArgument[];
+    public attrs: Attribute[];
+    public kind: 'throws' | 'rethrows' | null;
     public return: Type;
     public variadic: boolean;
 
-    constructor(line: number, col: number, kind: FunctionType.Kind) {
+    constructor(
+        line: number,
+        col: number,
+        kind: 'throws' | 'rethrows' | null = null,
+        variadic: boolean = false
+    ) {
         super(line, col);
         this.kind = kind;
-    }
-}
-
-export namespace FunctionType {
-    export const enum Kind {
-        none,
-        throws,
-        rethrows
+        this.variadic = variadic;
     }
 }
 
@@ -131,9 +107,9 @@ export class SelfType extends Type {}
 /**
  * TupleTypeElement node.
  */
-@mixin(ObjectLike(['attributes[]', 'name', 'type']))
+@mixin(ObjectLike(['attrs[]', 'name', 'type']))
 export class TupleTypeElement extends Node {
-    public attributes: Attribute[];
+    public attrs: Attribute[];
     public name: Identifier | null;
     public type: Type;
 }
@@ -144,12 +120,4 @@ export class TupleTypeElement extends Node {
 @mixin(ListLike)
 export class TupleType extends Type {
     [n: number]: TupleTypeElement;
-}
-
-/**
- * TypeInheritanceClause
- */
-@mixin(ListLike)
-export class TypeInheritanceClause extends Node {
-    [n: number]: TypeIdentifier;
 }

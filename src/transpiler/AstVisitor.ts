@@ -67,19 +67,11 @@ export class ASTVisitor {
         return this.visit(node);
     }
 
-    public visitTypeAnnotation(node: ast.TypeAnnotation): void {
-        return this.visit(node);
-    }
-
     public visitTupleTypeElement(node: ast.TupleTypeElement): void {
         return this.visit(node);
     }
 
     public visitFunctionTypeArgument(node: ast.FunctionTypeArgument): void {
-        return this.visit(node);
-    }
-
-    public visitTypeInheritanceClause(node: ast.TypeInheritanceClause): void {
         return this.visit(node);
     }
 
@@ -211,10 +203,6 @@ export class ASTVisitor {
         return this.visit(node);
     }
 
-    public visitConditionList(node: ast.ConditionList): void {
-        return this.visit(node);
-    }
-
     public visitCaseCondition(node: ast.CaseCondition): void {
         return this.visit(node);
     }
@@ -303,15 +291,7 @@ export class ASTVisitor {
         return this.visit(node);
     }
 
-    public visitImportPath(node: ast.ImportPath): void {
-        return this.visit(node);
-    }
-
-    public visitConstantDeclaration(node: ast.ConstantDeclaration): void {
-        return this.visit(node);
-    }
-
-    public visitPatternInitializer(node: ast.PatternInitializer): void {
+    public visitPatternBinding(node: ast.PatternBinding): void {
         return this.visit(node);
     }
 
@@ -319,11 +299,7 @@ export class ASTVisitor {
         return this.visit(node);
     }
 
-    public visitGetterSetterBlock(node: ast.GetterSetterBlock): void {
-        return this.visit(node);
-    }
-
-    public visitWillSetDidSetBlock(node: ast.WillSetDidSetBlock): void {
+    public visitAccessor(node: ast.Accessor): void {
         return this.visit(node);
     }
 
@@ -335,14 +311,6 @@ export class ASTVisitor {
         return this.visit(node);
     }
 
-    public visitFunctionResult(node: ast.FunctionResult): void {
-        return this.visit(node);
-    }
-
-    public visitParameterList(node: ast.ParameterList): void {
-        return this.visit(node);
-    }
-
     public visitParameter(node: ast.Parameter): void {
         return this.visit(node);
     }
@@ -351,15 +319,7 @@ export class ASTVisitor {
         return this.visit(node);
     }
 
-    public visitEnumMembers(node: ast.EnumMembers): void {
-        return this.visit(node);
-    }
-
-    public visitEnumMember(node: ast.EnumMember): void {
-        return this.visit(node);
-    }
-
-    public visitEnumCaseList(node: ast.EnumCaseList): void {
+    public visitEnumCaseList(node: ast.EnumCaseClause): void {
         return this.visit(node);
     }
 
@@ -367,23 +327,7 @@ export class ASTVisitor {
         return this.visit(node);
     }
 
-    public visitStructDeclaration(node: ast.StructDeclaration): void {
-        return this.visit(node);
-    }
-
-    public visitStructName(node: ast.StructName): void {
-        return this.visit(node);
-    }
-
-    public visitClassDeclaration(node: ast.ClassDeclaration): void {
-        return this.visit(node);
-    }
-
-    public visitProtocolDeclaration(node: ast.ProtocolDeclaration): void {
-        return this.visit(node);
-    }
-
-    public visitClasslikeBody(node: ast.ClasslikeBody): void {
+    public visitClassDeclaration(node: ast.ClassLikeDeclaration): void {
         return this.visit(node);
     }
 
@@ -401,59 +345,11 @@ export class ASTVisitor {
         return this.visit(node);
     }
 
-    public visitExtensionDeclaration(node: ast.ExtensionDeclaration): void {
-        return this.visit(node);
-    }
-
-    public visitExtensionBody(node: ast.ExtensionBody): void {
-        return this.visit(node);
-    }
-
     public visitSubscriptDeclaration(node: ast.SubscriptDeclaration): void {
         return this.visit(node);
     }
 
-    public visitOperatorDeclaration(node: ast.OperatorDeclaration): void {
-        return this.visit(node);
-    }
-
-    public visitPrecedenceGroupDeclaration(node: ast.PrecedenceGroupDeclaration): void {
-        return this.visit(node);
-    }
-
-    public visitPrecedenceGroupAttributes(node: ast.PrecedenceGroupAttributes): void {
-        return this.visit(node);
-    }
-
-    public visitPrecedenceGroupAttribute(node: ast.PrecedenceGroupAttribute): void {
-        return this.visit(node);
-    }
-
-    public visitDeclarationModifier(node: ast.DeclarationModifier): void {
-        return this.visit(node);
-    }
-
-    public visitDeclarationModifiers(node: ast.DeclarationModifiers): void {
-        return this.visit(node);
-    }
-
-    public visitAccessLevelModifier(node: ast.AccessLevelModifier): void {
-        return this.visit(node);
-    }
-
-    public visitMutationModifier(node: ast.MutationModifier): void {
-        return this.visit(node);
-    }
-
     public visitAttribute(node: ast.Attribute): void {
-        return this.visit(node);
-    }
-
-    public visitBalancedTokens(node: ast.BalancedTokens): void {
-        return this.visit(node);
-    }
-
-    public visitBalancedToken(node: ast.BalancedToken): void {
         return this.visit(node);
     }
 
@@ -489,23 +385,11 @@ export class ASTVisitor {
         return this.visit(node);
     }
 
-    public visitGenericParameterClause(node: ast.GenericParameterClause): void {
-        return this.visit(node);
-    }
-
     public visitGenericParameter(node: ast.GenericParameter): void {
         return this.visit(node);
     }
 
-    public visitGenericWhereClause(node: ast.GenericWhereClause): void {
-        return this.visit(node);
-    }
-
-    public visitConformanceRequirement(node: ast.ConformanceRequirement): void {
-        return this.visit(node);
-    }
-
-    public visitSameTypeRequirement(node: ast.SameTypeRequirement): void {
+    public visitRequirement(node: ast.Requirement): void {
         return this.visit(node);
     }
 }

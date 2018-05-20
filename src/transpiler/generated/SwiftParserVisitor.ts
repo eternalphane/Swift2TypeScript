@@ -231,7 +231,7 @@ import { ProtocolNameContext } from './SwiftParser';
 import { ProtocolBodyContext } from './SwiftParser';
 import { ProtocolMembersContext } from './SwiftParser';
 import { ProtocolMemberContext } from './SwiftParser';
-import { ProtocolMemberDeclatationContext } from './SwiftParser';
+import { ProtocolMemberDeclarationContext } from './SwiftParser';
 import { ProtocolPropertyDeclarationContext } from './SwiftParser';
 import { ProtocolMethodDeclarationContext } from './SwiftParser';
 import { ProtocolInitializerDeclarationContext } from './SwiftParser';
@@ -1888,11 +1888,11 @@ export interface SwiftParserVisitor<Result> extends ParseTreeVisitor<Result> {
 	visitProtocolMember?: (ctx: ProtocolMemberContext) => Result;
 
 	/**
-	 * Visit a parse tree produced by `SwiftParser.protocolMemberDeclatation`.
+	 * Visit a parse tree produced by `SwiftParser.protocolMemberDeclaration`.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	visitProtocolMemberDeclatation?: (ctx: ProtocolMemberDeclatationContext) => Result;
+	visitProtocolMemberDeclaration?: (ctx: ProtocolMemberDeclarationContext) => Result;
 
 	/**
 	 * Visit a parse tree produced by `SwiftParser.protocolPropertyDeclaration`.
