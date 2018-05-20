@@ -72,6 +72,7 @@
             "check-else",
             "check-whitespace"
         ],
+        "prefer-for-of": false,
         "quotemark": [
             true,
             "single",

@@ -1,5 +1,26 @@
 import { Constructor } from './util';
 
+export function final(target: any, key: PropertyKey, descriptor?: PropertyDescriptor): void;
+export function final<T extends Constructor>(target: T): T;
+export function final<T extends Constructor>(
+    target: T,
+    key?: PropertyKey,
+    descriptor?: PropertyDescriptor
+): any {
+    if (undefined !== key) {
+        // todo
+    } else {
+        return class Final extends target {
+            constructor(...args: any[]) {
+                if (new.target !== Final) {
+                    throw new Error(`Final class "${target.name}" cannot be extended`);
+                }
+                super(...args);
+            }
+        };
+    }
+}
+
 export function mixin(...bases: any[]): <T extends Constructor>(derived: T) => T {
     return function apply_mixin<T extends Constructor>(derived: T): T {
         const initializers: Array<() => void | InstanceType<T>> = [];
