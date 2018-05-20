@@ -1,0 +1,42 @@
+{
+    "compilerOptions": {
+        "alwaysStrict": true,
+        "baseUrl": ".",
+        "declaration": true,
+        "experimentalDecorators": true,
+        "lib": [
+            "dom",
+            "es2017"
+        ],
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "noImplicitAny": false,
+        "outDir": "build",
+        "paths": {
+            "*": ["node_modules/*"]
+        },
+        "plugins": [
+            {
+                "name": "tslint-language-service",
+                "disableNoUnusedVariableRule": false
+            }
+        ],
+        "sourceMap": true,
+        "stripInternal": true,
+        "strictNullChecks": true,
+        "target": "es6"
+    },
+    "include": ["src/**/*"],
+    "typeAcquisition": {
+        "enable": true
+    },
+    "typedocOptions": {
+        "exclude": "**/SwiftHelper.ts",
+        "excludeExternals": true,
+        "excludeNotExported": true,
+        "excludePrivate": true,
+        "ignoreCompilerErrors": true,
+        "mode": "modules",
+        "out": "doc"
+    }
+}
