@@ -141,9 +141,9 @@ export class AsTypeOperator extends Expression {
 /**
  * GenericIdentifier node.
  */
-@mixin(ObjectLike(['arguments', 'identifier']))
+@mixin(ObjectLike(['arguments[]', 'identifier']))
 export class GenericIdentifier extends Expression {
-    public arguments: Type[] | null;
+    public arguments: Type[];
     public identifier: Identifier;
 }
 
@@ -200,10 +200,10 @@ export class SelfExpression extends Expression {}
 export class SuperclassExpression extends Expression {}
 
 /**
- * CaptureListItem node.
+ * CaptureItem node.
  */
 @mixin(ObjectLike(['expr']))
-export class CaptureListItem extends Node {
+export class CaptureItem extends Node {
     public expr: Expression;
     public specifier: 'weak' | 'unowned' | 'unowned(safe)' | 'unowned(unsafe)' | null;
 
@@ -235,10 +235,10 @@ export class ClosureParameter extends Node {
 /**
  * ClosureSignature node.
  */
-@mixin(ObjectLike(['captures', 'parameters', 'result']))
+@mixin(ObjectLike(['captures[]', 'parameters[]', 'result']))
 export class ClosureSignature extends Node {
-    public captures: CaptureListItem[] | null;
-    public parameters: ClosureParameter[] | null;
+    public captures: CaptureItem[];
+    public parameters: ClosureParameter[];
     public result: Type | null;
     public throws: boolean;
 
@@ -251,10 +251,10 @@ export class ClosureSignature extends Node {
 /**
  * ClosureExpression node.
  */
-@mixin(ObjectLike(['signature', 'statements']))
+@mixin(ObjectLike(['signature', 'stmts[]']))
 export class ClosureExpression extends Expression {
     public signature: ClosureSignature | null;
-    public statements: Node[] | null;
+    public stmts: Node[];
 }
 
 /**
@@ -323,7 +323,7 @@ export class KeyPathStringExpression extends Expression {
 /**
  * SubscriptExpression node.
  */
-@mixin(ObjectLike(['arguments', 'expr']))
+@mixin(ObjectLike(['arguments[]', 'expr']))
 export class SubscriptExpression extends Expression {
     public arguments: FunctionCallArgument[];
     public expr: Expression;
@@ -346,9 +346,9 @@ export class UnwrappedExpression extends Expression {
 /**
  * FunctionCallExpression node.
  */
-@mixin(ObjectLike(['arguments', 'expr', 'closure']))
+@mixin(ObjectLike(['arguments[]', 'expr', 'closure']))
 export class FunctionCallExpression extends Expression {
-    public arguments: FunctionCallArgument[] | null;
+    public arguments: FunctionCallArgument[];
     public expr: Expression;
     public closure: ClosureExpression | null;
 }
@@ -356,9 +356,9 @@ export class FunctionCallExpression extends Expression {
 /**
  * ExplicitMemberExpression node.
  */
-@mixin(ObjectLike(['expr', 'labels', 'member']))
+@mixin(ObjectLike(['expr', 'labels[]', 'member']))
 export class ExplicitMemberExpression extends Expression {
     public expr: Expression;
-    public labels: Identifier[] | null;
+    public labels: Identifier[];
     public member: GenericIdentifier;
 }

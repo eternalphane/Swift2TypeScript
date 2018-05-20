@@ -59,8 +59,8 @@ export abstract class ListLike<T extends Node> extends Node {
 export function ObjectLike(keys: string[]): Constructor<Node> {
     return class ObjectLike extends Node {
         private _init(): Node {
-            for (const key of keys) {
-                this[key] = null;
+            for (let key of keys) {
+                '[]' === key.slice(-2) ? (this[(key = key.slice(0, -2))] = []) : (this[key] = null);
             }
             return new Proxy(this, {
                 set(target: ObjectLike, key: PropertyKey, value: any, receiver: any): boolean {

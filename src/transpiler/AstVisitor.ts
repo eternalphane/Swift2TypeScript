@@ -147,7 +147,7 @@ export class ASTVisitor {
         return this.visit(node);
     }
 
-    public visitCaptureListItem(node: ast.CaptureListItem): void {
+    public visitCaptureItem(node: ast.CaptureItem): void {
         return this.visit(node);
     }
 
@@ -243,19 +243,7 @@ export class ASTVisitor {
         return this.visit(node);
     }
 
-    public visitCaseLabel(node: ast.CaseLabel): void {
-        return this.visit(node);
-    }
-
     public visitCaseItem(node: ast.CaseItem): void {
-        return this.visit(node);
-    }
-
-    public visitWhereClause(node: ast.WhereClause): void {
-        return this.visit(node);
-    }
-
-    public visitStatementLabel(node: ast.StatementLabel): void {
         return this.visit(node);
     }
 
@@ -308,10 +296,6 @@ export class ASTVisitor {
     }
 
     public visitAvailabilityArgument(node: ast.AvailabilityArgument): void {
-        return this.visit(node);
-    }
-
-    public visitCodeBlock(node: ast.CodeBlock): void {
         return this.visit(node);
     }
 

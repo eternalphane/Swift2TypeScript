@@ -70,9 +70,9 @@ export namespace MetaType {
 /**
  * TypeAnnotation node.
  */
-@mixin(ObjectLike(['attributes', 'type']))
+@mixin(ObjectLike(['attributes[]', 'type']))
 export class TypeAnnotation extends Node {
-    public attributes: Attribute[] | null;
+    public attributes: Attribute[];
     public kind: TypeAnnotation.Kind;
     public type: Type;
 
@@ -101,10 +101,10 @@ export class FunctionTypeArgument extends Node {
 /**
  * FunctionType node.
  */
-@mixin(ObjectLike(['arguments', 'attributes', 'return']))
+@mixin(ObjectLike(['arguments[]', 'attributes[]', 'return']))
 export class FunctionType extends Type {
     public arguments: FunctionTypeArgument[];
-    public attributes: Attribute[] | null;
+    public attributes: Attribute[];
     public kind: FunctionType.Kind;
     public return: Type;
     public variadic: boolean;
@@ -131,9 +131,9 @@ export class SelfType extends Type {}
 /**
  * TupleTypeElement node.
  */
-@mixin(ObjectLike(['attributes', 'name', 'type']))
+@mixin(ObjectLike(['attributes[]', 'name', 'type']))
 export class TupleTypeElement extends Node {
-    public attributes: Attribute[] | null;
+    public attributes: Attribute[];
     public name: Identifier | null;
     public type: Type;
 }
