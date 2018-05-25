@@ -16,7 +16,7 @@ function line(ctx: ParserRuleContext): number {
 /**
  * Parser for building Swift AST.
  */
-export class ASTBuilderVisitor extends AbstractParseTreeVisitor<any>
+export class SwiftASTBuilderVisitor extends AbstractParseTreeVisitor<any>
     implements SwiftParserVisitor<any> {
     private _operators: OperatorTable;
 

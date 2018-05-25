@@ -4,7 +4,7 @@ import * as ast from './ast';
 /**
  * Visitor of Swift abstract syntax tree.
  */
-export class ASTVisitor {
+export abstract class SwiftASTVisitor {
     /**
      * Default callback, should not be used.
      * @final
