@@ -71,6 +71,10 @@ export class ASTVisitor {
         return this.visit(node);
     }
 
+    public visitCatchClause(node: ast.CatchClause): void {
+        return this.visit(node);
+    }
+
     public visitClassDeclaration(node: ast.ClassLikeDeclaration): void {
         return this.visit(node);
     }
@@ -80,10 +84,6 @@ export class ASTVisitor {
     }
 
     public visitClosureParameter(node: ast.ClosureParameter): void {
-        return this.visit(node);
-    }
-
-    public visitClosureSignature(node: ast.ClosureSignature): void {
         return this.visit(node);
     }
 
@@ -127,6 +127,10 @@ export class ASTVisitor {
         return this.visit(node);
     }
 
+    public visitElseClause(node: ast.ElseClause): void {
+        return this.visit(node);
+    }
+
     public visitEnumCase(node: ast.EnumCase): void {
         return this.visit(node);
     }
@@ -144,6 +148,10 @@ export class ASTVisitor {
     }
 
     public visitExplicitMemberExpression(node: ast.ExplicitMemberExpression): void {
+        return this.visit(node);
+    }
+
+    public visitExpressionPattern(node: ast.ExpressionPattern): void {
         return this.visit(node);
     }
 
@@ -256,6 +264,10 @@ export class ASTVisitor {
     }
 
     public visitOptionalPattern(node: ast.OptionalPattern): void {
+        return this.visit(node);
+    }
+
+    public visitOptionalType(node: ast.OptionalType): void {
         return this.visit(node);
     }
 
