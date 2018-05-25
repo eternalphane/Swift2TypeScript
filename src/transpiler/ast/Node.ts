@@ -1,7 +1,7 @@
 /** @module "transpiler/ast" */
 
 import { Constructor } from '../../util';
-import { ASTVisitor } from '../AstVisitor';
+import { SwiftASTVisitor } from '../SwiftAstVisitor';
 
 /**
  * Node of abstract syntax tree.
@@ -28,6 +28,10 @@ export abstract class Node implements ArrayLike<Node> {
         });
     }
 
+    public get children(): Node[] {
+        return this._children.slice();
+    }
+
     /**
      * Number of children nodes.
      */
@@ -35,10 +39,9 @@ export abstract class Node implements ArrayLike<Node> {
         return this._children.length;
     }
 
-    public accept(visitor: ASTVisitor): void {
-        let visit: (node: Node) => void = visitor[`visit${this.constructor.name}`];
-        visit = undefined === visit ? visitor.visit : visit;
-        visit.apply(visitor, this);
+    public accept(visitor: SwiftASTVisitor): any {
+        const visit: ((node: Node) => any) | undefined = visitor[`visit${this.constructor.name}`];
+        visit && visit.apply(visitor, this);
     }
 }
 

@@ -6,402 +6,412 @@ import * as ast from './ast';
  */
 export abstract class SwiftASTVisitor {
     /**
-     * Default callback, should not be used.
-     * @final
+     * The default implementation calls {@link ast.Node#accept} on the specified node.
      */
-    public visit(node: ast.Node): void {
+    public visit(node: ast.Node): any {
+        return node.accept(this);
+    }
+
+    public visitAccessor(node: ast.Accessor): any {
+        return null;
+    }
+
+    public visitAnyType(node: ast.AnyType): any {
+        return null;
+    }
+
+    public visitArrayLiteral(node: ast.ArrayLiteral): any {
+        return null;
+    }
+
+    public visitArrayType(node: ast.ArrayType): any {
+        return null;
+    }
+
+    public visitAsTypeOperator(node: ast.AsTypeOperator): any {
+        return null;
+    }
+
+    public visitAsTypePattern(node: ast.AsTypePattern): any {
+        return null;
+    }
+
+    public visitAssignmentOperator(node: ast.AssignmentOperator): any {
+        return null;
+    }
+
+    public visitAttribute(node: ast.Attribute): any {
+        return null;
+    }
+
+    public visitAvailabilityArgument(node: ast.AvailabilityArgument): any {
+        return null;
+    }
+
+    public visitAvailabilityCondition(node: ast.AvailabilityCondition): any {
+        return null;
+    }
+
+    public visitBreakStatement(node: ast.BreakStatement): any {
+        return null;
+    }
+
+    public visitCaptureItem(node: ast.CaptureItem): any {
+        return null;
+    }
+
+    public visitCaseCondition(node: ast.CaseCondition): any {
+        return null;
+    }
+
+    public visitCaseItem(node: ast.CaseItem): any {
+        return null;
+    }
+
+    public visitCatchClause(node: ast.CatchClause): any {
+        return null;
+    }
+
+    /**
+     * The default implementation tranverses the specified node and calls
+     * {@link SwiftASTVisitor#visit} on all leaf nodes.
+     */
+    public visitChildren(node: ast.Node): any {
+        if (!node.length) {
+            return this.visit(node);
+        }
         for (let i = 0; i < node.length; ++i) {
-            this.visit(node[i]);
+            this.visitChildren(node[i]);
         }
     }
 
-    public visitAccessor(node: ast.Accessor): void {
-        return this.visit(node);
+    public visitClassDeclaration(node: ast.ClassLikeDeclaration): any {
+        return null;
     }
 
-    public visitAnyType(node: ast.AnyType): void {
-        return this.visit(node);
+    public visitClosureExpression(node: ast.ClosureExpression): any {
+        return null;
     }
 
-    public visitArrayLiteral(node: ast.ArrayLiteral): void {
-        return this.visit(node);
+    public visitClosureParameter(node: ast.ClosureParameter): any {
+        return null;
     }
 
-    public visitArrayType(node: ast.ArrayType): void {
-        return this.visit(node);
+    public visitConditionalCompilationBlock(node: ast.ConditionalCompilationBlock): any {
+        return null;
     }
 
-    public visitAsTypeOperator(node: ast.AsTypeOperator): void {
-        return this.visit(node);
+    public visitConditionalOperator(node: ast.ConditionalOperator): any {
+        return null;
     }
 
-    public visitAsTypePattern(node: ast.AsTypePattern): void {
-        return this.visit(node);
+    public visitContinueStatement(node: ast.ContinueStatement): any {
+        return null;
     }
 
-    public visitAssignmentOperator(node: ast.AssignmentOperator): void {
-        return this.visit(node);
+    public visitDeferStatement(node: ast.DeferStatement): any {
+        return null;
     }
 
-    public visitAttribute(node: ast.Attribute): void {
-        return this.visit(node);
+    public visitDeinitializerDeclaration(node: ast.DeinitializerDeclaration): any {
+        return null;
     }
 
-    public visitAvailabilityArgument(node: ast.AvailabilityArgument): void {
-        return this.visit(node);
+    public visitDictionaryLiteral(node: ast.DictionaryLiteral): any {
+        return null;
     }
 
-    public visitAvailabilityCondition(node: ast.AvailabilityCondition): void {
-        return this.visit(node);
+    public visitDictionaryLiteralElement(node: ast.DictionaryLiteralElement): any {
+        return null;
     }
 
-    public visitBreakStatement(node: ast.BreakStatement): void {
-        return this.visit(node);
+    public visitDictionaryType(node: ast.DictionaryType): any {
+        return null;
     }
 
-    public visitCaptureItem(node: ast.CaptureItem): void {
-        return this.visit(node);
+    public visitDirectiveClause(node: ast.DirectiveClause): any {
+        return null;
     }
 
-    public visitCaseCondition(node: ast.CaseCondition): void {
-        return this.visit(node);
+    public visitDoStatement(node: ast.DoStatement): any {
+        return null;
     }
 
-    public visitCaseItem(node: ast.CaseItem): void {
-        return this.visit(node);
+    public visitElseClause(node: ast.ElseClause): any {
+        return null;
     }
 
-    public visitCatchClause(node: ast.CatchClause): void {
-        return this.visit(node);
+    public visitEnumCase(node: ast.EnumCase): any {
+        return null;
     }
 
-    public visitClassDeclaration(node: ast.ClassLikeDeclaration): void {
-        return this.visit(node);
+    public visitEnumCaseList(node: ast.EnumCaseClause): any {
+        return null;
     }
 
-    public visitClosureExpression(node: ast.ClosureExpression): void {
-        return this.visit(node);
+    public visitEnumCasePattern(node: ast.EnumCasePattern): any {
+        return null;
     }
 
-    public visitClosureParameter(node: ast.ClosureParameter): void {
-        return this.visit(node);
+    public visitEnumDeclaration(node: ast.EnumDeclaration): any {
+        return null;
     }
 
-    public visitConditionalCompilationBlock(node: ast.ConditionalCompilationBlock): void {
-        return this.visit(node);
+    public visitExplicitMemberExpression(node: ast.ExplicitMemberExpression): any {
+        return null;
     }
 
-    public visitConditionalOperator(node: ast.ConditionalOperator): void {
-        return this.visit(node);
+    public visitExpressionPattern(node: ast.ExpressionPattern): any {
+        return null;
     }
 
-    public visitContinueStatement(node: ast.ContinueStatement): void {
-        return this.visit(node);
+    public visitFallthroughStatement(node: ast.FallthroughStatement): any {
+        return null;
     }
 
-    public visitDeferStatement(node: ast.DeferStatement): void {
-        return this.visit(node);
+    public visitForInStatement(node: ast.ForInStatement): any {
+        return null;
     }
 
-    public visitDeinitializerDeclaration(node: ast.DeinitializerDeclaration): void {
-        return this.visit(node);
+    public visitFunctionCallArgument(node: ast.FunctionCallArgument): any {
+        return null;
     }
 
-    public visitDictionaryLiteral(node: ast.DictionaryLiteral): void {
-        return this.visit(node);
+    public visitFunctionCallExpression(node: ast.FunctionCallExpression): any {
+        return null;
     }
 
-    public visitDictionaryLiteralElement(node: ast.DictionaryLiteralElement): void {
-        return this.visit(node);
+    public visitFunctionDeclaration(node: ast.FunctionDeclaration): any {
+        return null;
     }
 
-    public visitDictionaryType(node: ast.DictionaryType): void {
-        return this.visit(node);
+    public visitFunctionType(node: ast.FunctionType): any {
+        return null;
     }
 
-    public visitDirectiveClause(node: ast.DirectiveClause): void {
-        return this.visit(node);
+    public visitFunctionTypeArgument(node: ast.FunctionTypeArgument): any {
+        return null;
     }
 
-    public visitDoStatement(node: ast.DoStatement): void {
-        return this.visit(node);
+    public visitGenericIdentifier(node: ast.GenericIdentifier): any {
+        return null;
     }
 
-    public visitElseClause(node: ast.ElseClause): void {
-        return this.visit(node);
+    public visitGenericParameter(node: ast.GenericParameter): any {
+        return null;
     }
 
-    public visitEnumCase(node: ast.EnumCase): void {
-        return this.visit(node);
+    public visitGuardStatement(node: ast.GuardStatement): any {
+        return null;
     }
 
-    public visitEnumCaseList(node: ast.EnumCaseClause): void {
-        return this.visit(node);
+    public visitIdentifier(node: ast.Identifier): any {
+        return null;
     }
 
-    public visitEnumCasePattern(node: ast.EnumCasePattern): void {
-        return this.visit(node);
+    public visitIdentifierPattern(node: ast.IdentifierPattern): any {
+        return null;
     }
 
-    public visitEnumDeclaration(node: ast.EnumDeclaration): void {
-        return this.visit(node);
+    public visitIfStatement(node: ast.IfStatement): any {
+        return null;
     }
 
-    public visitExplicitMemberExpression(node: ast.ExplicitMemberExpression): void {
-        return this.visit(node);
+    public visitImplicitMemberExpression(node: ast.ImplicitMemberExpression): any {
+        return null;
     }
 
-    public visitExpressionPattern(node: ast.ExpressionPattern): void {
-        return this.visit(node);
+    public visitImportDeclaration(node: ast.ImportDeclaration): any {
+        return null;
     }
 
-    public visitFallthroughStatement(node: ast.FallthroughStatement): void {
-        return this.visit(node);
+    public visitInOutExpression(node: ast.InOutExpression): any {
+        return null;
     }
 
-    public visitForInStatement(node: ast.ForInStatement): void {
-        return this.visit(node);
+    public visitInitializerDeclaration(node: ast.InitializerDeclaration): any {
+        return null;
     }
 
-    public visitFunctionCallArgument(node: ast.FunctionCallArgument): void {
-        return this.visit(node);
+    public visitIsTypeOperator(node: ast.IsTypeOperator): any {
+        return null;
     }
 
-    public visitFunctionCallExpression(node: ast.FunctionCallExpression): void {
-        return this.visit(node);
+    public visitIsTypePattern(node: ast.IsTypePattern): any {
+        return null;
     }
 
-    public visitFunctionDeclaration(node: ast.FunctionDeclaration): void {
-        return this.visit(node);
+    public visitKeyPathComponent(node: ast.KeyPathComponent): any {
+        return null;
     }
 
-    public visitFunctionType(node: ast.FunctionType): void {
-        return this.visit(node);
+    public visitKeyPathExpression(node: ast.KeyPathExpression): any {
+        return null;
     }
 
-    public visitFunctionTypeArgument(node: ast.FunctionTypeArgument): void {
-        return this.visit(node);
+    public visitKeyPathStringExpression(node: ast.KeyPathStringExpression): any {
+        return null;
     }
 
-    public visitGenericIdentifier(node: ast.GenericIdentifier): void {
-        return this.visit(node);
+    public visitLineControlStatement(node: ast.LineControlStatement): any {
+        return null;
     }
 
-    public visitGenericParameter(node: ast.GenericParameter): void {
-        return this.visit(node);
+    public visitLiteral(node: ast.Literal): any {
+        return null;
     }
 
-    public visitGuardStatement(node: ast.GuardStatement): void {
-        return this.visit(node);
+    public visitMetaType(node: ast.MetaType): any {
+        return null;
     }
 
-    public visitIdentifier(node: ast.Identifier): void {
-        return this.visit(node);
+    public visitOperator(node: ast.Operator): any {
+        return null;
     }
 
-    public visitIdentifierPattern(node: ast.IdentifierPattern): void {
-        return this.visit(node);
+    public visitOptionalBindingCondition(node: ast.OptionalBindingCondition): any {
+        return null;
     }
 
-    public visitIfStatement(node: ast.IfStatement): void {
-        return this.visit(node);
+    public visitOptionalPattern(node: ast.OptionalPattern): any {
+        return null;
     }
 
-    public visitImplicitMemberExpression(node: ast.ImplicitMemberExpression): void {
-        return this.visit(node);
+    public visitOptionalType(node: ast.OptionalType): any {
+        return null;
     }
 
-    public visitImportDeclaration(node: ast.ImportDeclaration): void {
-        return this.visit(node);
+    public visitParameter(node: ast.Parameter): any {
+        return null;
     }
 
-    public visitInOutExpression(node: ast.InOutExpression): void {
-        return this.visit(node);
+    public visitPatternBinding(node: ast.PatternBinding): any {
+        return null;
     }
 
-    public visitInitializerDeclaration(node: ast.InitializerDeclaration): void {
-        return this.visit(node);
+    public visitPlatformCondition(node: ast.PlatformCondition): any {
+        return null;
     }
 
-    public visitIsTypeOperator(node: ast.IsTypeOperator): void {
-        return this.visit(node);
+    public visitPlaygroundLiteral(node: ast.PlaygroundLiteral): any {
+        return null;
     }
 
-    public visitIsTypePattern(node: ast.IsTypePattern): void {
-        return this.visit(node);
-    }
-
-    public visitKeyPathComponent(node: ast.KeyPathComponent): void {
-        return this.visit(node);
-    }
-
-    public visitKeyPathExpression(node: ast.KeyPathExpression): void {
-        return this.visit(node);
-    }
-
-    public visitKeyPathStringExpression(node: ast.KeyPathStringExpression): void {
-        return this.visit(node);
-    }
-
-    public visitLineControlStatement(node: ast.LineControlStatement): void {
-        return this.visit(node);
-    }
-
-    public visitLiteral(node: ast.Literal): void {
-        return this.visit(node);
-    }
-
-    public visitMetaType(node: ast.MetaType): void {
-        return this.visit(node);
-    }
-
-    public visitOperator(node: ast.Operator): void {
-        return this.visit(node);
-    }
-
-    public visitOptionalBindingCondition(node: ast.OptionalBindingCondition): void {
-        return this.visit(node);
-    }
-
-    public visitOptionalPattern(node: ast.OptionalPattern): void {
-        return this.visit(node);
-    }
-
-    public visitOptionalType(node: ast.OptionalType): void {
-        return this.visit(node);
-    }
-
-    public visitParameter(node: ast.Parameter): void {
-        return this.visit(node);
-    }
-
-    public visitPatternBinding(node: ast.PatternBinding): void {
-        return this.visit(node);
-    }
-
-    public visitPlatformCondition(node: ast.PlatformCondition): void {
-        return this.visit(node);
-    }
-
-    public visitPlaygroundLiteral(node: ast.PlaygroundLiteral): void {
-        return this.visit(node);
-    }
-
-    public visitProgram(node: ast.Program): void {
-        return this.visit(node);
+    public visitProgram(node: ast.Program): any {
+        return null;
     }
 
     public visitProtocolAssociatedTypeDeclaration(
         node: ast.ProtocolAssociatedTypeDeclaration
-    ): void {
-        return this.visit(node);
+    ): any {
+        return null;
     }
 
-    public visitProtocolCompositionType(node: ast.ProtocolCompositionType): void {
-        return this.visit(node);
+    public visitProtocolCompositionType(node: ast.ProtocolCompositionType): any {
+        return null;
     }
 
-    public visitRepeatWhileStatement(node: ast.RepeatWhileStatement): void {
-        return this.visit(node);
+    public visitRepeatWhileStatement(node: ast.RepeatWhileStatement): any {
+        return null;
     }
 
-    public visitRequirement(node: ast.Requirement): void {
-        return this.visit(node);
+    public visitRequirement(node: ast.Requirement): any {
+        return null;
     }
 
-    public visitReturnStatement(node: ast.ReturnStatement): void {
-        return this.visit(node);
+    public visitReturnStatement(node: ast.ReturnStatement): any {
+        return null;
     }
 
-    public visitSelectorExpression(node: ast.SelectorExpression): void {
-        return this.visit(node);
+    public visitSelectorExpression(node: ast.SelectorExpression): any {
+        return null;
     }
 
-    public visitSelfExpression(node: ast.SelfExpression): void {
-        return this.visit(node);
+    public visitSelfExpression(node: ast.SelfExpression): any {
+        return null;
     }
 
-    public visitSelfType(node: ast.SelfType): void {
-        return this.visit(node);
+    public visitSelfType(node: ast.SelfType): any {
+        return null;
     }
 
-    public visitSubscriptDeclaration(node: ast.SubscriptDeclaration): void {
-        return this.visit(node);
+    public visitSubscriptDeclaration(node: ast.SubscriptDeclaration): any {
+        return null;
     }
 
-    public visitSubscriptExpression(node: ast.SubscriptExpression): void {
-        return this.visit(node);
+    public visitSubscriptExpression(node: ast.SubscriptExpression): any {
+        return null;
     }
 
-    public visitSuperclassExpression(node: ast.SuperclassExpression): void {
-        return this.visit(node);
+    public visitSuperclassExpression(node: ast.SuperclassExpression): any {
+        return null;
     }
 
-    public visitSwitchCase(node: ast.SwitchCase): void {
-        return this.visit(node);
+    public visitSwitchCase(node: ast.SwitchCase): any {
+        return null;
     }
 
-    public visitSwitchStatement(node: ast.SwitchStatement): void {
-        return this.visit(node);
+    public visitSwitchStatement(node: ast.SwitchStatement): any {
+        return null;
     }
 
-    public visitThrowStatement(node: ast.ThrowStatement): void {
-        return this.visit(node);
+    public visitThrowStatement(node: ast.ThrowStatement): any {
+        return null;
     }
 
-    public visitTryOperator(node: ast.TryOperator): void {
-        return this.visit(node);
+    public visitTryOperator(node: ast.TryOperator): any {
+        return null;
     }
 
-    public visitTupleElement(node: ast.TupleElement): void {
-        return this.visit(node);
+    public visitTupleElement(node: ast.TupleElement): any {
+        return null;
     }
 
-    public visitTupleExpression(node: ast.TupleExpression): void {
-        return this.visit(node);
+    public visitTupleExpression(node: ast.TupleExpression): any {
+        return null;
     }
 
-    public visitTuplePattern(node: ast.TuplePattern): void {
-        return this.visit(node);
+    public visitTuplePattern(node: ast.TuplePattern): any {
+        return null;
     }
 
-    public visitTuplePatternElement(node: ast.TuplePatternElement): void {
-        return this.visit(node);
+    public visitTuplePatternElement(node: ast.TuplePatternElement): any {
+        return null;
     }
 
-    public visitTupleType(node: ast.TupleType): void {
-        return this.visit(node);
+    public visitTupleType(node: ast.TupleType): any {
+        return null;
     }
 
-    public visitTupleTypeElement(node: ast.TupleTypeElement): void {
-        return this.visit(node);
+    public visitTupleTypeElement(node: ast.TupleTypeElement): any {
+        return null;
     }
 
-    public visitTypeIdentifier(node: ast.TypeIdentifier): void {
-        return this.visit(node);
+    public visitTypeIdentifier(node: ast.TypeIdentifier): any {
+        return null;
     }
 
-    public visitTypealiasDeclaration(node: ast.TypealiasDeclaration): void {
-        return this.visit(node);
+    public visitTypealiasDeclaration(node: ast.TypealiasDeclaration): any {
+        return null;
     }
 
-    public visitUnwrappedExpression(node: ast.UnwrappedExpression): void {
-        return this.visit(node);
+    public visitUnwrappedExpression(node: ast.UnwrappedExpression): any {
+        return null;
     }
 
-    public visitValueBindingPattern(node: ast.ValueBindingPattern): void {
-        return this.visit(node);
+    public visitValueBindingPattern(node: ast.ValueBindingPattern): any {
+        return null;
     }
 
-    public visitVariableDeclaration(node: ast.VariableDeclaration): void {
-        return this.visit(node);
+    public visitVariableDeclaration(node: ast.VariableDeclaration): any {
+        return null;
     }
 
-    public visitWhileStatement(node: ast.WhileStatement): void {
-        return this.visit(node);
+    public visitWhileStatement(node: ast.WhileStatement): any {
+        return null;
     }
 
-    public visitWildcard(node: ast.Wildcard): void {
-        return this.visit(node);
+    public visitWildcard(node: ast.Wildcard): any {
+        return null;
     }
 }

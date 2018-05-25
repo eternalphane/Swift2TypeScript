@@ -154,15 +154,15 @@ export class OperatorTable {
         name: string,
         assignment: boolean = false,
         associativity: 'left' | 'right' | null = null,
-        higher_than: string[] = [],
-        lower_than: string[] = []
+        higherThan: string[] = [],
+        lowerThan: string[] = []
     ): void {
         if (this._precedenceGroups.has(name)) {
             // FIXME
             throw new Error(`Precedence group "${name}" already exist`);
         }
         const npg = new PrecedenceGroup(assignment, associativity);
-        for (const name of higher_than) {
+        for (const name of higherThan) {
             if (!this._precedenceGroups.has(name)) {
                 // FIXME
                 throw new Error(`Precedence group "${name}" not exist`);
@@ -175,7 +175,7 @@ export class OperatorTable {
                 }
             }
         }
-        for (const name of lower_than) {
+        for (const name of lowerThan) {
             if (!this._precedenceGroups.has(name)) {
                 // FIXME
                 throw new Error(`Precedence group "${name}" not exist`);

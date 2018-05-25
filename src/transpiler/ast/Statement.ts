@@ -32,9 +32,9 @@ export class ForInStatement extends Statement {
     public sequence: Expression;
     public where: Expression | null;
 
-    constructor(line: number, col: number, has_case: boolean = false) {
+    constructor(line: number, col: number, hasCase: boolean = false) {
         super(line, col);
-        this.case = has_case;
+        this.case = hasCase;
     }
 }
 
