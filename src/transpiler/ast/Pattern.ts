@@ -42,9 +42,10 @@ export class TuplePatternElement extends Node {
 /**
  * TuplePattern node.
  */
-@mixin(ListLike)
+@mixin(ObjectLike(['elems[]', 'type']))
 export class TuplePattern extends Pattern {
-    [n: number]: TuplePatternElement;
+    public elems: TuplePatternElement[];
+    public type: Type | null;
 }
 
 /**
@@ -79,7 +80,7 @@ export class AsTypePattern extends Pattern {
  */
 @mixin(ObjectLike(['pattern']))
 export class OptionalPattern extends Pattern {
-    public pattern: Pattern;
+    public pattern: Identifier;
 }
 
 /**

@@ -2,12 +2,12 @@
 
 import { mixin } from '../../Decorator';
 import { Attribute } from './Attribute';
-import { CaptureSpecifier, Expression, Identifier, Operator, Literal } from './Expression';
+import { CaptureSpecifier, Expression, Identifier, Literal, Operator } from './Expression';
 import { GenericParameter, Requirement } from './Generic';
-import { ListLike, Node, ObjectLike } from './Node';
+import { Node, ObjectLike } from './Node';
 import { Pattern } from './Pattern';
-import { Statement, ConditionalCompilationBlock, LineControlStatement } from './Statement';
-import { Type, TupleType } from './Type';
+import { ConditionalCompilationBlock, LineControlStatement, Statement } from './Statement';
+import { TupleType, Type, TypeIdentifier } from './Type';
 
 export abstract class Declaration extends Statement {}
 
@@ -96,12 +96,12 @@ export class Accessor extends Node {
     public attrs: Attribute[];
     public body: Statement[];
     public kind: 'get' | 'set' | 'didSet' | 'willSet';
-    public modifiers: MutationModifier[];
+    public modifier: MutationModifier | null;
     public param: Identifier | null;
 
-    constructor(line: number, col: number, modifiers: MutationModifier[] = []) {
+    constructor(line: number, col: number, modifier: MutationModifier | null = null) {
         super(line, col);
-        this.modifiers = modifiers;
+        this.modifier = modifier;
     }
 }
 
@@ -141,12 +141,13 @@ export class VariableDeclaration extends Declaration {
 /**
  * TypealiasDeclaration node.
  */
-@mixin(ObjectLike(['attrs[]', 'name', 'params[]']))
+@mixin(ObjectLike(['attrs[]', 'name', 'params[]', 'type']))
 export class TypealiasDeclaration extends Declaration {
     public attrs: Attribute[];
     public modifier: AccessLevelModifier | null;
     public name: Identifier;
     public params: GenericParameter[];
+    public type: Type;
 
     constructor(line: number, col: number, modifier: AccessLevelModifier | null = null) {
         super(line, col);
@@ -206,9 +207,10 @@ export class FunctionDeclaration extends Declaration {
 /**
  * EnumCase node.
  */
-@mixin(ObjectLike(['associatedValue', 'rawValue']))
+@mixin(ObjectLike(['associatedValue', 'name', 'rawValue']))
 export class EnumCase extends Node {
     public associatedValue: TupleType | null;
+    public name: Identifier;
     public rawValue: Literal | null;
 }
 
@@ -288,15 +290,16 @@ export type ClassLikeMember = Declaration | ConditionalCompilationBlock | LineCo
 /**
  * ClassLikeDeclaration node.
  */
-@mixin(ObjectLike(['attrs[]', 'body[]', 'heritage[]', 'name', 'params[]', 'where[]']))
+@mixin(ObjectLike(['attrs[]', 'body[]', 'extension', 'heritage[]', 'name', 'params[]', 'where[]']))
 export class ClassLikeDeclaration extends Declaration {
     public attrs: Attribute[];
     public body: ClassLikeMember[];
+    public extension: TypeIdentifier | null;
     public final: boolean;
     public heritage: Type[];
     public kind: 'class' | 'struct' | 'extension' | 'protocol';
     public modifier: AccessLevelModifier | null;
-    public name: Identifier;
+    public name: Identifier | null;
     public params: GenericParameter[];
     public where: Requirement[];
 
@@ -354,14 +357,14 @@ export class DeinitializerDeclaration extends Declaration {
 /**
  * SubscriptDeclaration node.
  */
-@mixin(ObjectLike(['attrs[]', 'accessors[]', 'genericParams[]', 'params[]', 'result', 'where[]']))
+@mixin(ObjectLike(['attrs[]', 'accessors[]', 'genericParams[]', 'params[]', 'return', 'where[]']))
 export class SubscriptDeclaration extends Declaration {
     public attrs: Attribute[];
     public accessors: Accessor[];
     public genericParams: GenericParameter[];
     public modifiers: DeclarationModifier[];
     public params: Parameter[];
-    public result: Type;
+    public return: Type;
     public where: Requirement[];
 
     constructor(line: number, col: number, modifiers: DeclarationModifier[] = []) {

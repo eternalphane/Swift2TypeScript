@@ -136,14 +136,14 @@ binaryOperator
 
 type
     : '[' type ']' # arrayType
-    | '[' type ':' type ']' # dictionaryType
-    | attributes? functionTypeArgumentClause ('throws'? | 'rethrows') '->' type # functionType
+    | '[' KEY = type ':' VALUE = type ']' # dictionaryType
+    | attributes? functionTypeArgumentClause KIND = ('throws' | 'rethrows')? '->' type # functionType
     | typeIdentifier # generalType
     | tupleType # tupleTypeAlternative
     | type {isPostOp(this._input)}? '?' # optionalType
     | type {isPostOp(this._input)}? '!' # implicitlyUnwrappedOptionalType
     | protocolCompositionType # protocolCompositionTypeAlternative
-    | type '.' ('Type' | 'Protocol') # metatypeType
+    | type '.' KIND = ('Type' | 'Protocol') # metatypeType
     | 'Any' # anyType
     | 'Self' # selfType
     | '(' type ')' # parenthesizedType
@@ -152,7 +152,7 @@ type
 // GRAMMAR OF A TYPE ANNOTATION
 
 typeAnnotation
-    : ':' attributes? 'inout'? type
+    : ':' attributes? INOUT = 'inout'? type
 ;
 
 // GRAMMAR OF A TYPE IDENTIFIER
@@ -192,8 +192,7 @@ functionTypeArgumentList
 ;
 
 functionTypeArgument
-    : attributes? 'inout'? type
-    | argumentLabel typeAnnotation
+    : (argumentLabel ':')? attributes? INOUT = 'inout'? type
 ;
 
 argumentLabel
@@ -222,8 +221,7 @@ expression
 ;
 
 expressionList
-    : expression
-    | expression ',' expressionList
+    : expression (',' expression)*
 ;
 
 // GRAMMAR OF A PREFIX EXPRESSION
@@ -240,7 +238,7 @@ inOutExpression
 // GRAMMAR OF A TRY EXPRESSION
 
 tryOperator
-    : 'try' ({isPostOp(this._input)}? TYPE = ('?' | '!'))?
+    : 'try' ({isPostOp(this._input)}? MARK = ('?' | '!'))?
 ;
 
 // GRAMMAR OF A BINARY EXPRESSION
@@ -266,7 +264,7 @@ conditionalOperator
 // GRAMMAR OF A TYPE-CASTING OPERATOR
 
 typeCastingOperator
-    : ('is' | 'as' ({isPostOp(this._input)}? ('?' | '!'))?) type
+    : ('is' | 'as' ({isPostOp(this._input)}? MARK = ('?' | '!'))?) type
 ;
 
 // GRAMMAR OF A PRIMARY EXPRESSION
@@ -304,7 +302,7 @@ arrayLiteral
 ;
 
 dictionaryLiteral
-    : '[' expression ':' expression (',' expression ':' expression)* ','? ']'
+    : '[' KEYS += expression ':' VALUES += expression (',' KEYS += expression ':' VALUES += expression)* ','? ']'
 ;
 
 /**
@@ -348,7 +346,8 @@ selfInitializerExpression
 // GRAMMAR OF A SUPERCLASS EXPRESSION
 
 superclassExpression
-    : superclassMethodExpression
+    : 'super'
+    | superclassMethodExpression
     | superclassSubscriptExpression
     | superclassInitializerExpression
 ;
@@ -372,7 +371,7 @@ closureExpression
 ;
 
 closureSignature
-    : (captureList? closureParameterClause 'throws'? functionResult? | captureList) 'in'
+    : (captureList? closureParameterClause THROWS = 'throws'? functionResult? | captureList) 'in'
 ;
 
 closureParameterClause
@@ -468,7 +467,7 @@ keyPathPostfix
  * '#selector' '(' 'setter' ':' expression ')'
  */
 selectorExpression
-    : '#selector' '(' functionCallArgumentList ')'
+    : '#selector' '(' functionCallArgument ')'
 ;
 
 // GRAMMAR OF A KEY-PATH STRING EXPRESSION
@@ -483,7 +482,7 @@ postfixExpression
     : primaryExpression # generalPostfixExpression
     | postfixExpression postfixOperator # postfixOperatorExpression
     | postfixExpression {!isStatementStarting(this._input)}? (functionCallArgumentClause | functionCallArgumentClause? trailingClosure) # functionCallExpression
-    | postfixExpression '.' 'init' ('(' argumentNames ')')? # initializerExpression
+    | postfixExpression '.' INIT = 'init' ('(' argumentNames ')')? # initializerExpression
     | postfixExpression '.' (DECIMAL_DIGITS | identifier (genericArgumentClause? | '(' argumentNames ')')) # explicitMemberExpression
     | postfixExpression '.' 'self' # postfixSelfExpression
     | postfixExpression {!isStatementStarting(this._input)}? '[' functionCallArgumentList ']' # subscriptExpression
@@ -502,7 +501,7 @@ functionCallArgumentList
 ;
 
 functionCallArgument
-    : (('_' | identifier) ':')? (expression | operator)
+    : ((WILDCARD = '_' | identifier) ':')? (expression | operator)
 ;
 
 trailingClosure
@@ -512,7 +511,11 @@ trailingClosure
 // GRAMMAR OF AN EXPLICIT MEMBER EXPRESSION
 
 argumentNames
-    : (('_' | identifier) ':')+
+    : argumentName+
+;
+
+argumentName
+    : ('_' | identifier) ':'
 ;
 
 // Statements
@@ -540,7 +543,7 @@ loopStatement
 // GRAMMAR OF A FOR-IN STATEMENT
 
 forInStatement
-    : 'for' 'case'? pattern 'in' expression whereClause? codeBlock
+    : 'for' CASE = 'case'? pattern 'in' expression whereClause? codeBlock
 ;
 
 // GRAMMAR OF A WHILE STATEMENT
@@ -613,7 +616,7 @@ caseLabel
 ;
 
 caseItemList
-    : pattern whereClause? (',' pattern whereClause?)*
+    : pattern whereClause? (',' caseItemList)?
 ;
 
 defaultLabel
@@ -971,7 +974,7 @@ functionName
 ;
 
 functionSignature
-    : parameterClause ('throws' | 'rethrows')? functionResult?
+    : parameterClause KIND = ('throws' | 'rethrows')? functionResult?
 ;
 
 functionResult
@@ -991,7 +994,7 @@ parameterList
 ;
 
 parameter
-    : externalParameterName? localParameterName typeAnnotation (defaultArgumentClause | {testLN(this._input, 1, ["..."])}? operator)?
+    : externalParameterName? localParameterName typeAnnotation (defaultArgumentClause | {testLN(this._input, 1, ["..."])}? ELLIPSIS = operator)?
 ;
 
 externalParameterName
@@ -1014,7 +1017,7 @@ enumDeclaration
 ;
 
 unionStyleEnum
-    : ('indirect')? 'enum' enumName genericParameterClause? typeInheritanceClause? genericWhereClause? '{' unionStyleEnumMembers? '}'
+    : INDIRECT = 'indirect'? 'enum' enumName genericParameterClause? typeInheritanceClause? genericWhereClause? '{' unionStyleEnumMembers? '}'
 ;
 
 unionStyleEnumMembers
@@ -1028,7 +1031,7 @@ unionStyleEnumMember
 ;
 
 unionStyleEnumCaseClause
-    : attributes? ('indirect')? 'case' unionStyleEnumCaseList
+    : attributes? INDIRECT = 'indirect'? 'case' unionStyleEnumCaseList
 ;
 
 unionStyleEnumCaseList
@@ -1109,7 +1112,7 @@ structMember
 // GRAMMAR OF A CLASS DECLARATION
 
 classDeclaration
-    : attributes? (accessLevelModifier? ('final')? | 'final' accessLevelModifier) 'class' className genericParameterClause? typeInheritanceClause? genericWhereClause? classBody
+    : attributes? (accessLevelModifier? FINAL = 'final'? | FINAL = 'final' accessLevelModifier) 'class' className genericParameterClause? typeInheritanceClause? genericWhereClause? classBody
 ;
 
 className
@@ -1176,7 +1179,7 @@ protocolMethodDeclaration
 // GRAMMAR OF A PROTOCOL INITIALIZER DECLARATION
 
 protocolInitializerDeclaration
-    : initializerHead genericParameterClause? parameterClause ('throws' | 'rethrows')? genericWhereClause?
+    : initializerHead genericParameterClause? parameterClause KIND = ('throws' | 'rethrows')? genericWhereClause?
 ;
 
 // GRAMMAR OF A PROTOCOL SUBSCRIPT DECLARATION
@@ -1194,11 +1197,11 @@ protocolAssociatedTypeDeclaration
 // GRAMMAR OF AN INITIALIZER DECLARATION
 
 initializerDeclaration
-    : initializerHead genericParameterClause? parameterClause ('throws' | 'rethrows')? genericWhereClause? initializerBody
+    : initializerHead genericParameterClause? parameterClause KIND = ('throws' | 'rethrows')? genericWhereClause? initializerBody
 ;
 
 initializerHead
-    : attributes? declarationModifiers? 'init' ({isPostOp(this._input)}? ('?' | '!'))?
+    : attributes? declarationModifiers? 'init' ({isPostOp(this._input)}? MARK = ('?' | '!'))?
 ;
 
 initializerBody
@@ -1301,7 +1304,7 @@ precedenceGroupAssignment
 ;
 
 precedenceGroupAssociativity
-    : 'associativity' ':' ('left' | 'right' | 'none')
+    : 'associativity' ':' VALUE = ('left' | 'right' | 'none')
 ;
 
 precedenceGroupNames
@@ -1399,7 +1402,7 @@ balancedToken
 pattern
     : '_' typeAnnotation? # wildcardPattern
     | identifier typeAnnotation? # identifierPattern
-    | ('var' | 'let') pattern # valueBindingPattern
+    | KIND = ('var' | 'let') pattern # valueBindingPattern
     | tuplePattern typeAnnotation? # tuplePatternAlternative
     | typeIdentifier? '.' enumCaseName tuplePattern? # enumCasePattern
     | identifier {isPostOp(this._input)}? '?' # optionalPattern

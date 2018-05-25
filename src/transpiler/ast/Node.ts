@@ -38,11 +38,13 @@ export abstract class Node implements ArrayLike<Node> {
     public accept(visitor: ASTVisitor): void {
         let visit: (node: Node) => void = visitor[`visit${this.constructor.name}`];
         visit = undefined === visit ? visitor.visit : visit;
-        visit(this);
+        visit.apply(visitor, this);
     }
 }
 
 export abstract class ListLike<T extends Node> extends Node {
+    [n: number]: T;
+
     private _init(): Node {
         return new Proxy(this, {
             set(target: ListLike<T>, key: PropertyKey, value: any, receiver: any): boolean {
@@ -64,10 +66,10 @@ export function ObjectLike(keys: string[]): Constructor<Node> {
             }
             return new Proxy(this, {
                 set(target: ObjectLike, key: PropertyKey, value: any, receiver: any): boolean {
-                    const result: boolean = Reflect.set(target, key, value, receiver);
+                    const result = Reflect.set(target, key, value, receiver);
                     if (keys.includes(key as string)) {
                         for (const key of keys) {
-                            const child: any = target[key];
+                            const child = target[key];
                             if (Array.isArray(child)) {
                                 target._children.splice(target._children.length, 0, ...child);
                             } else if (child instanceof Node) {

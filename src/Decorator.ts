@@ -8,7 +8,7 @@ export function final<T extends Constructor>(
     descriptor?: PropertyDescriptor
 ): any {
     if (undefined !== key) {
-        // todo
+        // TODO
     } else {
         return class Final extends target {
             constructor(...args: any[]) {
@@ -29,10 +29,10 @@ export function mixin(...bases: any[]): <T extends Constructor>(derived: T) => T
                 if ('_init' === name && 'function' === typeof base.prototype._init) {
                     initializers.push(base.prototype._init);
                 } else if ('constructor' !== name) {
-                    const descriptor: PropertyDescriptor = Reflect.getOwnPropertyDescriptor(
+                    const descriptor = Reflect.getOwnPropertyDescriptor(
                         base.prototype,
                         name
-                    )!;
+                    );
                     if (
                         descriptor &&
                         (!descriptor.writable ||
@@ -51,7 +51,7 @@ export function mixin(...bases: any[]): <T extends Constructor>(derived: T) => T
         function surrogate(...args: any[]): InstanceType<T> {
             let self: InstanceType<T> = new derived(...args);
             for (const initializer of initializers) {
-                const result: any = initializer.apply(self);
+                const result = initializer.apply(self);
                 if (result instanceof derived) {
                     self = result;
                 }
@@ -64,7 +64,7 @@ export function mixin(...bases: any[]): <T extends Constructor>(derived: T) => T
 }
 
 export function override(target: any, key: PropertyKey, descriptor?: PropertyDescriptor): void {
-    const base: {} = Reflect.getPrototypeOf(target);
+    const base = Reflect.getPrototypeOf(target);
     if ('function' !== typeof base[key]) {
         throw new Error(
             `Method "${target.constructor.name}#${key}" does not override any base class method`

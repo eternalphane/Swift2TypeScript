@@ -9,10 +9,10 @@ import { Pattern } from './Pattern';
 export abstract class Statement extends Node {}
 
 /**
- * Abstract syntax tree.
+ * Program node.
  */
 @mixin(ListLike)
-export class AST extends Node {
+export class Program extends Node {
     [n: number]: Statement;
 
     constructor() {
@@ -32,9 +32,9 @@ export class ForInStatement extends Statement {
     public sequence: Expression;
     public where: Expression | null;
 
-    constructor(line: number, col: number, hasCase: boolean = false) {
+    constructor(line: number, col: number, has_case: boolean = false) {
         super(line, col);
-        this.case = hasCase;
+        this.case = has_case;
     }
 }
 
@@ -50,7 +50,7 @@ export class AvailabilityArgument extends Node {
         | 'macOSApplicationExtension'
         | 'watchOS'
         | 'tvOS';
-    public version: [number, number, number] | null;
+    public version: number[] | null;
 
     constructor(
         line: number,
@@ -63,7 +63,7 @@ export class AvailabilityArgument extends Node {
             | 'macOSApplicationExtension'
             | 'watchOS'
             | 'tvOS' = '*',
-        version: [number, number, number] | null = null
+        version: number[] | null = null
     ) {
         super(line, col);
         this.platform = platform;
@@ -182,10 +182,10 @@ export class SwitchCase extends Node {
 /**
  * SwitchStatement node.
  */
-@mixin(ObjectLike(['cases[]', 'expr', 'label']))
+@mixin(ObjectLike(['cases[]', 'condition', 'label']))
 export class SwitchStatement extends Statement {
     public cases: SwitchCase[];
-    public expr: Expression;
+    public condition: Expression;
     public label: Identifier | null;
 }
 
@@ -247,10 +247,11 @@ export class CatchClause extends Node {
 /**
  * DoStatement node.
  */
-@mixin(ObjectLike(['body[]', 'catchClause[]']))
+@mixin(ObjectLike(['body[]', 'catchClause[]', 'label']))
 export class DoStatement extends Statement {
     public body: Statement[];
     public catchClauses: CatchClause[];
+    public label: Identifier | null;
 }
 
 /**
@@ -258,7 +259,7 @@ export class DoStatement extends Statement {
  * @todo
  */
 export class ConditionalCompilationBlock extends Statement {
-    // todo
+    // TODO
 }
 
 /**
@@ -266,7 +267,7 @@ export class ConditionalCompilationBlock extends Statement {
  * @todo
  */
 export class DirectiveClause extends Node {
-    // todo
+    // TODO
 }
 
 /**
@@ -274,7 +275,7 @@ export class DirectiveClause extends Node {
  * @todo
  */
 export class PlatformCondition extends Node {
-    // todo
+    // TODO
 }
 
 /**
@@ -282,5 +283,5 @@ export class PlatformCondition extends Node {
  * @todo
  */
 export class LineControlStatement extends Statement {
-    // todo
+    // TODO
 }
