@@ -28,7 +28,7 @@ export class Identifier extends Expression {
  * Wildcard node.
  */
 export class Wildcard extends Identifier {
-    public readonly name;
+    public readonly name: string;
 
     constructor(line: number, col: number) {
         super(line, col, '_');
@@ -39,19 +39,30 @@ export class Wildcard extends Identifier {
  * Literal node.
  */
 export class Literal extends Expression {
-    public value: string | number | boolean | null;
+    public value: string | number | boolean | null | undefined;
+    public template: [string, Array<[Expression, string]>] | null;
 
-    constructor(line: number, col: number, value: string | number | boolean | null = null) {
+    constructor(
+        line: number,
+        col: number,
+        value: string | number | boolean | null | undefined = null,
+        template: [string, Array<[Expression, string]>] | null = null
+    ) {
         super(line, col);
         this.value = value;
+        this.template = template;
     }
 
-    public get kind(): 'string' | 'number' | 'boolean' | 'nil' {
-        return null === this.value ? 'nil' : (typeof this.value as any);
+    public get kind(): 'string' | 'number' | 'boolean' | 'template' | 'nil' {
+        return this.template
+            ? 'template'
+            : null === this.value
+                ? 'nil'
+                : (typeof this.value as any);
     }
 
     public toString(): string {
-        return String(this.value);
+        return this.template ? '' : String(this.value);
     }
 }
 
@@ -118,16 +129,18 @@ export class ConditionalOperator extends Expression {
 /**
  * IsTypeOperator node.
  */
-@mixin(ObjectLike(['type']))
+@mixin(ObjectLike(['expr', 'type']))
 export class IsTypeOperator extends Expression {
+    public expr: Expression;
     public type: Type;
 }
 
 /**
  * AsTypeOperator node.
  */
-@mixin(ObjectLike(['type']))
+@mixin(ObjectLike(['expr', 'type']))
 export class AsTypeOperator extends Expression {
+    public expr: Expression;
     public mark: '?' | '!' | null;
     public type: Type;
 
@@ -140,9 +153,9 @@ export class AsTypeOperator extends Expression {
 /**
  * GenericIdentifier node.
  */
-@mixin(ObjectLike(['arguments[]', 'identifier']))
+@mixin(ObjectLike(['args[]', 'identifier']))
 export class GenericIdentifier extends Expression {
-    public arguments: Type[];
+    public args: Type[];
     public identifier: Identifier;
 }
 
@@ -185,7 +198,7 @@ export class FunctionCallArgument extends Node {
  * @todo
  */
 export class PlaygroundLiteral extends Expression {
-    // todo
+    // TODO
 }
 
 /**
@@ -236,28 +249,20 @@ export class ClosureParameter extends Node {
 }
 
 /**
- * ClosureSignature node.
+ * ClosureExpression node.
  */
-@mixin(ObjectLike(['captures[]', 'params[]', 'result']))
-export class ClosureSignature extends Node {
+@mixin(ObjectLike(['captures[]', 'params[]', 'return', 'stmts[]']))
+export class ClosureExpression extends Expression {
     public captures: CaptureItem[];
     public params: ClosureParameter[];
-    public result: Type | null;
+    public return: Type | null;
+    public stmts: Statement[];
     public throws: boolean;
 
     constructor(line: number, col: number, throws: boolean = false) {
         super(line, col);
         this.throws = throws;
     }
-}
-
-/**
- * ClosureExpression node.
- */
-@mixin(ObjectLike(['signature', 'stmts[]']))
-export class ClosureExpression extends Expression {
-    public signature: ClosureSignature | null;
-    public stmts: Statement[];
 }
 
 /**
@@ -290,7 +295,7 @@ export class TupleExpression extends Expression {
  * @todo
  */
 export class KeyPathComponent extends Node {
-    // todo
+    // TODO
 }
 
 /**
@@ -298,7 +303,7 @@ export class KeyPathComponent extends Node {
  * @todo
  */
 export class KeyPathExpression extends Expression {
-    // todo
+    // TODO
 }
 
 /**
@@ -326,9 +331,9 @@ export class KeyPathStringExpression extends Expression {
 /**
  * SubscriptExpression node.
  */
-@mixin(ObjectLike(['arguments[]', 'expr']))
+@mixin(ObjectLike(['args[]', 'expr']))
 export class SubscriptExpression extends Expression {
-    public arguments: FunctionCallArgument[];
+    public args: FunctionCallArgument[];
     public expr: Expression;
 }
 
@@ -349,11 +354,11 @@ export class UnwrappedExpression extends Expression {
 /**
  * FunctionCallExpression node.
  */
-@mixin(ObjectLike(['arguments[]', 'expr', 'closure']))
+@mixin(ObjectLike(['args[]', 'closure', 'expr']))
 export class FunctionCallExpression extends Expression {
-    public arguments: FunctionCallArgument[];
-    public expr: Expression;
+    public args: FunctionCallArgument[];
     public closure: ClosureExpression | null;
+    public expr: Expression;
 }
 
 /**
@@ -361,7 +366,8 @@ export class FunctionCallExpression extends Expression {
  */
 @mixin(ObjectLike(['expr', 'labels[]', 'member']))
 export class ExplicitMemberExpression extends Expression {
+    public args: Type[];
     public expr: Expression;
     public labels: Identifier[];
-    public member: GenericIdentifier;
+    public member: Identifier;
 }

@@ -1,8 +1,8 @@
 import { Token, TokenStream } from 'antlr4ts';
 import { SwiftLexer } from './generated/SwiftLexer';
 
-export const WS: number[] = [SwiftLexer.WHITESPACE, SwiftLexer.LINE_BREAK];
-export const OP_LWS: number[] = [
+export const WS = [SwiftLexer.WHITESPACE, SwiftLexer.LINE_BREAK];
+export const OP_LWS = [
     SwiftLexer.WHITESPACE,
     SwiftLexer.LINE_BREAK,
     SwiftLexer.LEFT_PARENTHESIS,
@@ -12,7 +12,7 @@ export const OP_LWS: number[] = [
     SwiftLexer.SEMICOLON,
     SwiftLexer.COLON
 ];
-export const OP_RWS: number[] = [
+export const OP_RWS = [
     SwiftLexer.WHITESPACE,
     SwiftLexer.LINE_BREAK,
     SwiftLexer.RIGHT_PARENTHESIS,
@@ -30,7 +30,7 @@ export function testLN(
     hidden: boolean = false,
     fallback: boolean = false
 ): boolean {
-    const prop: string = 'string' === typeof tokens[0] ? 'text' : 'type';
+    const prop = 'string' === typeof tokens[0] ? 'text' : 'type';
     let tn: Token;
     if (hidden) {
         try {
@@ -61,8 +61,8 @@ export function isPostOp(input: TokenStream): boolean {
     return !testLN(input, -1, OP_LWS, true, true) && testLN(input, 1, OP_RWS, true, true);
 }
 export function isStatementStarting(input: TokenStream): boolean {
-    for (let i: number = input.index - 1; -1 < i; --i) {
-        const t: number = input.get(i).type;
+    for (let i = input.index - 1; -1 < i; --i) {
+        const t = input.get(i).type;
         if (t === SwiftLexer.LINE_BREAK || t === SwiftLexer.COMMA || t === SwiftLexer.LEFT_BRACE) {
             return true;
         } else if (t !== SwiftLexer.WHITESPACE) {

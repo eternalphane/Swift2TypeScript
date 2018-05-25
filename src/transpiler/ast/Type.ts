@@ -107,9 +107,8 @@ export class SelfType extends Type {}
 /**
  * TupleTypeElement node.
  */
-@mixin(ObjectLike(['attrs[]', 'name', 'type']))
+@mixin(ObjectLike(['name', 'type']))
 export class TupleTypeElement extends Node {
-    public attrs: Attribute[];
     public name: Identifier | null;
     public type: Type;
 }
@@ -120,4 +119,18 @@ export class TupleTypeElement extends Node {
 @mixin(ListLike)
 export class TupleType extends Type {
     [n: number]: TupleTypeElement;
+}
+
+/**
+ * OptionalType node.
+ */
+@mixin(ObjectLike(['type']))
+export class OptionalType extends Type {
+    public mark: '?' | '!';
+    public type: Type;
+
+    constructor(line: number, col: number, mark: '?' | '!' = '?') {
+        super(line, col);
+        this.mark = mark;
+    }
 }
