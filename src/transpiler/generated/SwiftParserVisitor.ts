@@ -111,6 +111,7 @@ import { FunctionCallArgumentListContext } from './SwiftParser';
 import { FunctionCallArgumentContext } from './SwiftParser';
 import { TrailingClosureContext } from './SwiftParser';
 import { ArgumentNamesContext } from './SwiftParser';
+import { ArgumentNameContext } from './SwiftParser';
 import { StatementContext } from './SwiftParser';
 import { StatementsContext } from './SwiftParser';
 import { LoopStatementContext } from './SwiftParser';
@@ -1046,6 +1047,13 @@ export interface SwiftParserVisitor<Result> extends ParseTreeVisitor<Result> {
 	 * @return the visitor result
 	 */
 	visitArgumentNames?: (ctx: ArgumentNamesContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by `SwiftParser.argumentName`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitArgumentName?: (ctx: ArgumentNameContext) => Result;
 
 	/**
 	 * Visit a parse tree produced by `SwiftParser.statement`.
